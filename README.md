@@ -48,7 +48,17 @@ dose. A dog already on the smallest unit cannot have its dose reduced, so the fr
 instead: BID ×2 weeks, SID ×2 weeks, stop. Pregabalin always uses that frequency ladder because
 its capsules cannot be split.
 
-Every week is overridable from a dropdown; labels, quantities and the waiver text all recalculate.
+**No more than two units of one strength per dose.** Six 100 mg capsules twice daily is not
+something an owner will manage, so any representation using two or fewer units always wins where
+one exists — 600 mg is one 600 mg tablet, never six 100 mg capsules. Where no combination of
+stocked strengths reaches the dose in two units (a 60 kg dog on trazodone, which only comes as
+100 mg), the tool says so rather than hiding it.
+
+Every week is overridable from a dropdown that offers **every** way of giving that amount — for
+300 mg you get both `½ × 600 mg tablet` and `1 × 300 mg capsule`, and for 600 mg you get
+`1 × 600 mg tablet`, `2 × 300 mg capsules` and `¾ × 800 mg tablet`. Both stepping down to a whole
+lower strength and cutting the tablet you are already on are acceptable, so the vet picks.
+Labels, quantities and the waiver text all recalculate.
 
 Labels are grouped by **drug + strength** — one label per strength, listing every week that uses
 it, so a strength spanning two weeks stays on a single bag.

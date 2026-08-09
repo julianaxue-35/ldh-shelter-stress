@@ -1172,6 +1172,8 @@ function joinList(items) {
    capsules, and keeps 200 mg as two capsules rather than a quarter of
    an 800 mg tablet.
    ================================================================== */
+var MAX_UNITS_PER_STRENGTH = 2;
+
 function optionCost(parts) {
   var cost = (parts.length - 1) * 3;
   parts.forEach(function (p) {
@@ -1179,8 +1181,17 @@ function optionCost(parts) {
     if (Math.abs(frac - 0.5) < 0.01) cost += 2;
     else if (frac > EPS) cost += 3;
     cost += p.count;
+    /* Asking an owner for six capsules twice daily is not realistic. Anything
+       past two units of one strength is penalised hard, so a representation
+       using two or fewer units always wins where one exists. */
+    if (p.count > MAX_UNITS_PER_STRENGTH + EPS) cost += (p.count - MAX_UNITS_PER_STRENGTH) * 8;
   });
   return cost;
+}
+
+/* true when any single strength needs more than two units per dose */
+function exceedsUnitCap(option) {
+  return option.parts.some(function (p) { return p.count > MAX_UNITS_PER_STRENGTH + EPS; });
 }
 
 function buildOptions(drugKey, capsulesOnly) {
@@ -1270,6 +1281,36 @@ function optionByMg(drugKey, mg) {
     if (Math.abs(list[i].mg - mg) < EPS) return list[i];
   }
   return null;
+}
+
+/* The representation of a given amount that uses a named strength, so an
+   override can ask for "1 x 300 mg capsule" rather than "half a 600 mg tablet"
+   when both deliver 300 mg. Falls back to the default representation. */
+function repFor(drugKey, mg, strengthMg) {
+  if (strengthMg) {
+    var reps = representations(drugKey, mg);
+    for (var i = 0; i < reps.length; i++) {
+      if (reps[i].parts[0].unit.mg === strengthMg) return reps[i];
+    }
+  }
+  return optionByMg(drugKey, mg);
+}
+
+/* Every way of giving each achievable amount up to maxMg, for the week
+   dropdown. Both "1 x 600 mg tablet" and "3/4 x 800 mg tablet" are offered
+   where both exist, since either is acceptable and the vet picks. */
+function weekChoices(drugKey, maxMg) {
+  var out = [];
+  OPTIONS[drugKey].forEach(function (o) {
+    if (o.mg > maxMg + EPS) return;
+    var reps = representations(drugKey, o.mg).filter(function (r) { return !exceedsUnitCap(r); });
+    if (!reps.length) reps = [o];
+    reps.forEach(function (r) {
+      out.push({ mg: o.mg, strength: r.parts[0].unit.mg, label: r.label, cost: r.cost });
+    });
+  });
+  out.sort(function (a, b) { return a.mg - b.mg || a.cost - b.cost; });
+  return out;
 }
 
 /*
@@ -1484,6 +1525,11 @@ function doseBlock(drugKey, opt, weight, mgkgTarget, title, extraClass) {
     warn = '<div class="tablet-warn">Nearest stocked strength delivers ' + formatNum(actual, 2)
          + ' mg/kg against a target of ' + formatNum(mgkgTarget, 2)
          + ' mg/kg. Confirm this is acceptable for this dog.</div>';
+  }
+  if (exceedsUnitCap(opt)) {
+    warn += '<div class="tablet-warn">More than ' + MAX_UNITS_PER_STRENGTH
+         + ' units per dose, which is a lot to ask of an owner. No smaller combination of '
+         + 'stocked strengths reaches this dose.</div>';
   }
   return '<div class="dose-block ' + (extraClass || '') + '">'
        + '<div class="dose-block-title">' + esc(title) + '</div>'
@@ -1801,15 +1847,20 @@ function weanTable(drugKey, ladder) {
     html += '<tr' + (edited ? ' class="edited"' : '') + '>';
     html += '<td class="wk">Week ' + w.week + '</td>';
     html += '<td class="amt">' + formatMg(w.option.mg) + ' mg ' + w.freq + '</td>';
+    var curStrength = w.option.parts[0].unit.mg;
+    var matched = false;
     html += '<td><select data-drug="' + drugKey + '" data-week="' + w.week + '" class="week-override">';
-    OPTIONS[drugKey].forEach(function (o) {
-      if (o.mg > ladder.startMg + EPS) return;
-      var chosen = Math.abs(o.mg - w.option.mg) < EPS;
-      /* show the representation this week actually uses, which may keep the
-         previous week's tablet rather than the globally cheapest one */
-      html += '<option value="' + o.mg + '"' + (chosen ? ' selected' : '') + '>'
-            + (chosen ? w.option.label : o.label) + '</option>';
+    weekChoices(drugKey, ladder.startMg).forEach(function (c) {
+      var chosen = !matched && Math.abs(c.mg - w.option.mg) < EPS && c.strength === curStrength;
+      if (chosen) matched = true;
+      html += '<option value="' + c.mg + '|' + c.strength + '"' + (chosen ? ' selected' : '') + '>'
+            + c.label + '</option>';
     });
+    /* the ladder reused the previous week's tablet in a way the cap filters out */
+    if (!matched) {
+      html += '<option value="' + w.option.mg + '|' + curStrength + '" selected>'
+            + w.option.label + '</option>';
+    }
     html += '</select></td>';
     html += '<td class="pct">' + pct + '%</td></tr>';
   });
@@ -1920,7 +1971,8 @@ function recalcWean(rebuild) {
     ladder.weeks.forEach(function (w) {
       var ov = overrides[plan.drugKey + ':' + w.week];
       if (ov !== undefined) {
-        var o = optionByMg(plan.drugKey, ov);
+        var bits = String(ov).split('|');
+        var o = repFor(plan.drugKey, parseFloat(bits[0]), bits[1] ? parseFloat(bits[1]) : 0);
         if (o) w.option = o;
       }
     });
@@ -1944,6 +1996,15 @@ function recalcWean(rebuild) {
     wHtml += weanTable(plan.drugKey, plan.ladder);
     if (plan.ladder.note) {
       wHtml += '<div class="banner banner-info"><h4>Note</h4><p>' + esc(plan.ladder.note) + '</p></div>';
+    }
+    var heavy = plan.ladder.weeks.filter(function (w) { return exceedsUnitCap(w.option); });
+    if (heavy.length) {
+      wHtml += '<div class="banner banner-warning"><h4>More than '
+             + MAX_UNITS_PER_STRENGTH + ' units per dose</h4><p>Week '
+             + heavy.map(function (w) { return w.week; }).join(', week ')
+             + ' needs more than ' + MAX_UNITS_PER_STRENGTH
+             + ' units per dose. No smaller combination of stocked strengths reaches the step. '
+             + 'Consider overriding to a nearby amount that can be given in one or two units.</p></div>';
     }
     wHtml += '</div>';
   });
@@ -2008,7 +2069,7 @@ function recalcWean(rebuild) {
 
   Array.prototype.forEach.call(document.querySelectorAll('.week-override'), function (sel) {
     sel.addEventListener('change', function () {
-      overrides[sel.getAttribute('data-drug') + ':' + sel.getAttribute('data-week')] = parseFloat(sel.value);
+      overrides[sel.getAttribute('data-drug') + ':' + sel.getAttribute('data-week')] = sel.value;
       recalcWean(false);
     });
   });
