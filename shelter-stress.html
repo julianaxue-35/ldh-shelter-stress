@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  LDH Shelter Stress Management Tool - Dogs
+  Copyright (c) 2026 Juliana Xue. All rights reserved.
+
+  This work is the intellectual property of Juliana Xue.
+  It is licensed to her current employer for use ONLY for as
+  long as she remains engaged there; that right of use ends
+  automatically when her engagement ends.
+
+  Except for that limited employer use-licence, no part of
+  this work may be copied, modified, distributed, or used
+  without the express written permission of Juliana Xue.
+  ============================================================
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shelter stress management: dogs</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #f5f4ee;
+  --bg-tertiary: #faf9f3;
+  --bg-info: #E6F1FB;
+  --bg-danger: #FCEBEB;
+  --bg-warning: #FAEEDA;
+  --bg-success: #EAF3DE;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5f5e5a;
+  --text-tertiary: #888780;
+  --text-info: #0C447C;
+  --text-danger: #791F1F;
+  --text-warning: #633806;
+  --text-success: #27500A;
+  --border-tertiary: rgba(0,0,0,0.15);
+  --border-secondary: rgba(0,0,0,0.30);
+  --border-info: #185FA5;
+  --border-danger: #A32D2D;
+  --border-warning: #854F0B;
+  --border-success: #4C7A22;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --fc-gray-bg: #F1EFE8; --fc-gray-border: #5F5E5A; --fc-gray-text: #2C2C2A;
+  --fc-coral-bg: #FAECE7; --fc-coral-border: #993C1D; --fc-coral-text: #4A1B0C;
+  --fc-blue-bg: #E6F1FB; --fc-blue-border: #185FA5; --fc-blue-text: #042C53;
+  --fc-teal-bg: #E1F5EE; --fc-teal-border: #0F6E56; --fc-teal-text: #04342C;
+  --fc-purple-bg: #EEEDFE; --fc-purple-border: #534AB7; --fc-purple-text: #26215C;
+  --fc-amber-bg: #FAEEDA; --fc-amber-border: #854F0B; --fc-amber-text: #412402;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a1a;
+    --bg-secondary: #2c2c2a;
+    --bg-tertiary: #222220;
+    --bg-info: #042C53;
+    --bg-danger: #501313;
+    --bg-warning: #412402;
+    --bg-success: #173404;
+    --text-primary: #f5f4ee;
+    --text-secondary: #c2c0b6;
+    --text-tertiary: #9c9a92;
+    --text-info: #B5D4F4;
+    --text-danger: #F7C1C1;
+    --text-warning: #FAC775;
+    --text-success: #C0DD97;
+    --border-tertiary: rgba(255,255,255,0.15);
+    --border-secondary: rgba(255,255,255,0.30);
+    --border-success: #7FA855;
+    --fc-gray-bg: #444441; --fc-gray-border: #B4B2A9; --fc-gray-text: #F5F4EE;
+    --fc-coral-bg: #712B13; --fc-coral-border: #F0997B; --fc-coral-text: #F5F4EE;
+    --fc-blue-bg: #0C447C; --fc-blue-border: #85B7EB; --fc-blue-text: #F5F4EE;
+    --fc-teal-bg: #085041; --fc-teal-border: #5DCAA5; --fc-teal-text: #F5F4EE;
+    --fc-purple-bg: #3C3489; --fc-purple-border: #AFA9EC; --fc-purple-text: #F5F4EE;
+    --fc-amber-bg: #633806; --fc-amber-border: #EF9F27; --fc-amber-text: #F5F4EE;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+  margin: 0;
+  padding: 0.75rem;
+}
+
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  border: 0.5px solid var(--border-tertiary);
+}
+
+.header {
+  padding: 0 0 1rem;
+  border-bottom: 0.5px solid var(--border-tertiary);
+  margin-bottom: 1rem;
+}
+.header h1 { font-size: 20px; font-weight: 500; margin: 0 0 4px; line-height: 1.3; }
+.header p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+.header a { color: inherit; }
+
+.sec { padding: 1rem 0; }
+.sec + .sec { border-top: 0.5px solid var(--border-tertiary); }
+.sec-title { font-size: 17px; font-weight: 500; margin: 0 0 0.75rem; }
+.sec-intro { font-size: 13px; color: var(--text-secondary); margin: -0.25rem 0 0.75rem; }
+.sub-title {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  margin: 1.25rem 0 0.5rem;
+}
+
+/* Mode switcher */
+.mode-bar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  margin-bottom: 1rem;
+}
+.mode-btn {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  padding: 10px 14px;
+  min-height: 46px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.mode-btn small { display: block; font-size: 11px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
+.mode-btn:hover { background: var(--bg); }
+.mode-btn.active {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--border-secondary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Forms */
+.calc-card {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin: 0.75rem 0;
+}
+.calc-form { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 1rem; }
+.calc-form:last-child { margin-bottom: 0; }
+
+.form-group-label {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  border-bottom: 0.5px solid var(--border-tertiary);
+  padding-bottom: 4px;
+  margin-top: 4px;
+}
+.form-group-label:first-child { margin-top: 0; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field.wide { grid-column: 1 / -1; }
+.field label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.field input, .field select {
+  font-family: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 0.5px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 44px;
+  width: 100%;
+}
+.field input:focus, .field select:focus {
+  outline: none;
+  border-color: var(--text-info);
+  box-shadow: 0 0 0 2px var(--bg-info);
+}
+.field.dimmed { opacity: 0.45; }
+.field-help { font-size: 11px; color: var(--text-tertiary); font-style: italic; margin-top: 2px; }
+
+/* Sign pickers */
+.sign-cols { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.sign-group-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+.sign-group-title.arousal { color: var(--text-warning); }
+.sign-group-title.fear { color: var(--text-info); }
+.sign-list { list-style: none; margin: 0; padding: 0; }
+.sign-list li { margin: 0; }
+.sign-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  padding: 4px 0;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.sign-list input { width: 17px; height: 17px; min-height: 0; margin: 2px 0 0; flex: 0 0 auto; }
+
+/* Results */
+.result-card {
+  background: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1rem;
+  border: 0.5px solid var(--border-tertiary);
+}
+
+.dose-block {
+  margin: 10px 0;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--border-info);
+}
+.dose-block:first-child { margin-top: 0; }
+.dose-block.next-dose { border-left-color: var(--border-success); }
+.dose-block.max-dose { border-left-color: var(--border-danger); }
+.dose-block-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.dose-block-value { font-size: 20px; font-weight: 500; line-height: 1.25; }
+.dose-block-mg { font-size: 14px; color: var(--text-secondary); margin-top: 2px; }
+.dose-block-tablet {
+  font-size: 14px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--border-tertiary);
+  font-weight: 500;
+}
+.dose-block-tablet .tab-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 400;
+}
+.tablet-warn { font-size: 12px; color: var(--text-danger); margin-top: 6px; font-style: italic; }
+
+.banner {
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin: 12px 0;
+  border: 0.5px solid;
+  border-left-width: 4px;
+}
+.banner h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.banner p { margin: 0; font-size: 14px; line-height: 1.5; }
+.banner p + p { margin-top: 6px; }
+.banner ul { margin: 6px 0 0; padding-left: 1.2rem; font-size: 14px; line-height: 1.5; }
+.banner-danger { background: var(--bg-danger); border-color: var(--border-danger); color: var(--text-danger); }
+.banner-warning { background: var(--bg-warning); border-color: var(--border-warning); color: var(--text-warning); }
+.banner-info { background: var(--bg-info); border-color: var(--border-info); color: var(--text-info); }
+.banner-success { background: var(--bg-success); border-color: var(--border-success); color: var(--text-success); }
+.banner-danger h4, .banner-warning h4, .banner-info h4, .banner-success h4 { color: inherit; }
+
+/* Weaning table */
+.wean-drug { margin: 0 0 1.25rem; }
+.wean-drug:last-child { margin-bottom: 0; }
+.wean-drug-head { font-size: 15px; font-weight: 500; margin: 0 0 2px; }
+.wean-drug-sub { font-size: 12px; color: var(--text-secondary); margin: 0 0 8px; }
+
+.wean-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.wean-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 6px 8px;
+  border-bottom: 0.5px solid var(--border-secondary);
+}
+.wean-table td { padding: 8px; border-bottom: 0.5px solid var(--border-tertiary); vertical-align: middle; }
+.wean-table tr:last-child td { border-bottom: none; }
+.wean-table .wk { white-space: nowrap; font-weight: 500; width: 1%; }
+.wean-table .pct { white-space: nowrap; color: var(--text-secondary); width: 1%; text-align: right; }
+.wean-table .amt { font-weight: 500; white-space: nowrap; }
+.wean-table select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 5px 6px;
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-primary);
+  max-width: 100%;
+}
+.wean-table tr.stop-row td { color: var(--text-success); font-weight: 500; }
+.wean-table tr.edited .amt::after {
+  content: ' edited';
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-warning);
+}
+
+/* Labels */
+.label-card {
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin: 10px 0;
+  background: var(--bg);
+  break-inside: avoid;
+}
+.label-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  border-bottom: 0.5px dashed var(--border-secondary);
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+.label-card-drug { font-size: 15px; font-weight: 600; }
+.label-card-qty {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.label-sig { font-size: 14px; line-height: 1.55; margin: 0; }
+.label-sig ol { margin: 0; padding-left: 1.2rem; }
+.label-sig li { margin: 3px 0; }
+.label-sig p { margin: 0; }
+.label-foot {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px dashed var(--border-secondary);
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.label-foot .caps {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.label-index {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Note template */
+.note-box {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 14px;
+  min-height: 40px;
+  border-radius: var(--radius-md);
+  border: 0.5px solid var(--border-secondary);
+  background: var(--bg);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.btn:hover { background: var(--bg-secondary); }
+.btn-primary { background: var(--bg-info); border-color: var(--border-info); color: var(--text-info); }
+
+/* Flowchart */
+.fc { margin: 1rem 0; }
+.fc-box {
+  max-width: 460px;
+  margin: 0 auto;
+  border: 0.5px solid;
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
+}
+.fc-gray { background: var(--fc-gray-bg); border-color: var(--fc-gray-border); color: var(--fc-gray-text); }
+.fc-coral { background: var(--fc-coral-bg); border-color: var(--fc-coral-border); color: var(--fc-coral-text); }
+.fc-blue { background: var(--fc-blue-bg); border-color: var(--fc-blue-border); color: var(--fc-blue-text); }
+.fc-teal { background: var(--fc-teal-bg); border-color: var(--fc-teal-border); color: var(--fc-teal-text); }
+.fc-purple { background: var(--fc-purple-bg); border-color: var(--fc-purple-border); color: var(--fc-purple-text); }
+.fc-amber { background: var(--fc-amber-bg); border-color: var(--fc-amber-border); color: var(--fc-amber-text); }
+
+.fc-step-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  opacity: 0.75;
+  display: block;
+  margin-bottom: 4px;
+}
+.fc-box-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
+.fc-box-sub { font-size: 13px; opacity: 0.9; line-height: 1.4; }
+.fc-box-list { margin: 8px 0 0; font-size: 13px; line-height: 1.5; padding: 0; list-style: none; }
+.fc-box-list li { padding: 2px 0 2px 14px; position: relative; }
+.fc-box-list li::before { content: '\00B7'; position: absolute; left: 4px; font-weight: bold; font-size: 18px; line-height: 1; top: 3px; }
+.fc-cap-line { font-weight: 500; color: var(--text-danger); }
+@media (prefers-color-scheme: dark) { .fc-cap-line { color: #F7C1C1; } }
+.fc-action-row {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 0.5px dashed currentColor;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.fc-arrow-down { width: 2px; height: 22px; background: var(--text-secondary); margin: 4px auto; position: relative; }
+.fc-arrow-down::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid var(--text-secondary);
+}
+.fc-pair { max-width: 460px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 12px; }
+.fc-pair .fc-box { max-width: none; margin: 0; }
+.fc-callout {
+  max-width: 460px;
+  margin: 12px auto;
+  background: var(--bg-info);
+  border-left: 3px solid var(--border-info);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-info);
+  line-height: 1.5;
+}
+
+/* Reference */
+.card-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.ref-card {
+  background: var(--bg);
+  border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  break-inside: avoid;
+}
+.ref-card h4 { font-size: 15px; font-weight: 500; margin: 0 0 0.5rem; }
+.ref-card ul { margin: 0; padding-left: 1.15rem; font-size: 13px; line-height: 1.65; }
+.ref-card li { margin: 4px 0; }
+.ref-card p { font-size: 13px; line-height: 1.6; margin: 0.75rem 0 0; }
+
+.chip-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border-tertiary);
+}
+
+.checklist { list-style: none; padding: 0; margin: 0; font-size: 13px; line-height: 1.6; }
+.checklist li { padding: 4px 0 4px 26px; position: relative; }
+.checklist li::before {
+  content: '';
+  position: absolute;
+  left: 2px; top: 9px;
+  width: 13px; height: 13px;
+  border: 1px solid var(--border-secondary);
+  border-radius: 3px;
+}
+
+.dev-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dev-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  padding: 6px 8px;
+  border-bottom: 0.5px solid var(--border-secondary);
+}
+.dev-table td { padding: 8px; border-bottom: 0.5px solid var(--border-tertiary); vertical-align: top; line-height: 1.5; }
+.dev-table tr:last-child td { border-bottom: none; }
+
+.footnote {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  padding: 0.75rem 0;
+  border-top: 0.5px solid var(--border-tertiary);
+  margin-top: 1rem;
+  line-height: 1.5;
+}
+
+.muted { color: var(--text-secondary); font-size: 13px; margin: 0; }
+.hidden { display: none !important; }
+
+@media (min-width: 620px) {
+  body { padding: 1.5rem; }
+  .container { padding: 1.5rem 2rem 2rem; }
+  .header h1 { font-size: 22px; }
+  .calc-form { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .card-grid { grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+  .mode-bar { grid-template-columns: 1fr 1fr 1fr; }
+  .sign-cols { grid-template-columns: 1fr 1fr; }
+  .fc-box { max-width: 520px; }
+  .fc-pair { max-width: 700px; grid-template-columns: 1fr 1fr; }
+  .fc-callout { max-width: 700px; }
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .container { border: none; padding: 0; max-width: 100%; }
+  .ref-card, .fc-box, .label-card, .banner { break-inside: avoid; }
+  .sec { break-inside: avoid; }
+  .calc-card { background: white; border: 0.5px solid #ccc; }
+  .btn-row, .no-print, .mode-bar { display: none !important; }
+  .wean-table select { border: none; background: none; -webkit-appearance: none; appearance: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+  <h1>Shelter stress management: dogs</h1>
+  <p>Dosing, recheck and weaning support for LDH North Melbourne and Cranbourne. Implements the SOP <em>Shelter Stress Management &ndash; Dogs</em> v1.0 with the changes listed under <a href="#deviations">Changes from SOP v1.0</a>. For veterinary use only. Tool version 1.0.</p>
+</div>
+
+<div class="mode-bar no-print" role="tablist">
+  <button class="mode-btn active" data-mode="start" type="button">1. Start medication<small>New shelter stress case</small></button>
+  <button class="mode-btn" data-mode="recheck" type="button">2. Recheck<small>48&ndash;72 h or weekly review</small></button>
+  <button class="mode-btn" data-mode="wean" type="button">3. Wean and discharge<small>Adoption, foster or rescue</small></button>
+</div>
+
+<!-- ============================ SHARED PATIENT ============================ -->
+<section class="sec" style="padding-top:0;">
+  <div class="calc-card">
+    <div class="calc-form">
+      <div class="form-group-label">Patient and vet</div>
+      <div class="field">
+        <label for="vetinit">Vet initials</label>
+        <input type="text" id="vetinit" placeholder="e.g. JX" maxlength="6">
+      </div>
+      <div class="field">
+        <label for="notedate">Date</label>
+        <input type="date" id="notedate">
+      </div>
+      <div class="field">
+        <label for="dogid">Patient ID</label>
+        <input type="text" id="dogid" placeholder="e.g. 123456">
+      </div>
+      <div class="field">
+        <label for="dogname">Dog name (optional)</label>
+        <input type="text" id="dogname" placeholder="e.g. Tommy">
+      </div>
+      <div class="field">
+        <label for="weight">Weight (kg)</label>
+        <input type="number" id="weight" min="0.5" max="100" step="0.1" value="20">
+      </div>
+      <div class="field">
+        <label for="location">Location (optional)</label>
+        <input type="text" id="location" placeholder="e.g. CB pen 14">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MODE 1: START ============================ -->
+<div id="panel-start">
+<section class="sec">
+  <h3 class="sec-title">Start shelter stress medication</h3>
+  <p class="sec-intro">Tick the signs the dog is showing, choose the drug, and the tool gives the dose, the tablet breakdown and a note you can paste into Teams or Sheltermate.</p>
+
+  <div class="calc-card">
+    <div class="sign-cols">
+      <div>
+        <div class="sign-group-title arousal">Arousal signs</div>
+        <ul class="sign-list" id="signs-arousal"></ul>
+      </div>
+      <div>
+        <div class="sign-group-title fear">Fear or shut-down signs</div>
+        <ul class="sign-list" id="signs-fear"></ul>
+      </div>
+    </div>
+
+    <div class="calc-form" style="margin-top:1rem;">
+      <div class="form-group-label">Medication</div>
+      <div class="field">
+        <label for="start-drug">Drug</label>
+        <select id="start-drug">
+          <option value="trazodone" selected>Trazodone (first line)</option>
+          <option value="gabapentin">Gabapentin</option>
+          <option value="pregabalin">Pregabalin</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="start-mgkg">Dose (mg/kg per dose, BID)</label>
+        <input type="number" id="start-mgkg" min="0.5" max="60" step="0.5" value="6">
+        <div class="field-help" id="start-help"></div>
+      </div>
+      <div class="field">
+        <label for="start-dose">Dose actually given (per dose)</label>
+        <select id="start-dose"></select>
+        <div class="field-help">Nearest achievable amount from stocked strengths.</div>
+      </div>
+      <div class="field">
+        <label for="start-fas">Initial FAS score (optional)</label>
+        <input type="text" id="start-fas" placeholder="e.g. 4">
+      </div>
+    </div>
+
+    <div id="start-result" class="result-card"></div>
+  </div>
+
+  <div class="sub-title">Note for Teams or Sheltermate</div>
+  <div class="note-box" id="start-note"></div>
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" data-copy="start-note" type="button">Copy note</button>
+  </div>
+
+  <div class="banner banner-info">
+    <h4>Before you leave the pen</h4>
+    <ul>
+      <li>Update clinical records under the <strong>shelter stress consult</strong> tab</li>
+      <li>Add the dog to the <strong>sick and injured list</strong></li>
+      <li>Fill in the green <strong>Shelter Stress Medication Sheet</strong> and place it on the pen</li>
+      <li>Post in the <strong>Shelter Stress Cases</strong> Teams chat: ID number, location, stress signs</li>
+      <li>Add the shelter stress medication waiver to the dog's <strong>Sheltermate</strong> file</li>
+    </ul>
+  </div>
+</section>
+</div>
+
+<!-- ============================ MODE 2: RECHECK ============================ -->
+<div id="panel-recheck" class="hidden">
+<section class="sec">
+  <h3 class="sec-title">Recheck shelter stress dose</h3>
+  <p class="sec-intro">Reassess every 48 to 72 hours until the signs settle, then weekly. Check in between 10am and 3pm so short-acting medications are onboard. Review the FAS scores on the medication sheet, the daily observation notes, and talk to the attendants.</p>
+
+  <div class="calc-card">
+    <div class="calc-form">
+      <div class="form-group-label">Current medication</div>
+      <div class="field">
+        <label for="rc-drug">Primary drug</label>
+        <select id="rc-drug">
+          <option value="trazodone" selected>Trazodone</option>
+          <option value="gabapentin">Gabapentin</option>
+          <option value="pregabalin">Pregabalin</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rc-mgkg">Current dose (mg/kg per dose, BID)</label>
+        <input type="number" id="rc-mgkg" min="0.5" max="60" step="0.5" value="6">
+        <div class="field-help" id="rc-help"></div>
+      </div>
+      <div class="field">
+        <label for="rc-addon">Second drug already on board</label>
+        <select id="rc-addon">
+          <option value="none" selected>None</option>
+          <option value="gabapentin">Gabapentin</option>
+          <option value="pregabalin">Pregabalin</option>
+        </select>
+      </div>
+      <div class="field" id="rc-addon-mgkg-field">
+        <label for="rc-addon-mgkg">Second drug dose (mg/kg per dose, BID)</label>
+        <input type="number" id="rc-addon-mgkg" min="0.5" max="60" step="0.5" value="20">
+      </div>
+
+      <div class="form-group-label">Response at this recheck</div>
+      <div class="field">
+        <label for="rc-response">How is the shelter stress tracking?</label>
+        <select id="rc-response">
+          <option value="managed">Well managed &mdash; signs resolving</option>
+          <option value="partial" selected>Partial response &mdash; some improvement, not enough</option>
+          <option value="ineffective">Ineffective &mdash; no meaningful change</option>
+          <option value="worse">Deteriorating or welfare concern</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rc-weeks">Time on medication so far</label>
+        <select id="rc-weeks">
+          <option value="0" selected>Less than 2 weeks</option>
+          <option value="2">2 to 4 weeks</option>
+          <option value="4">4 weeks or more</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="rc-fas">Current FAS score (optional)</label>
+        <input type="text" id="rc-fas" placeholder="e.g. 2">
+      </div>
+    </div>
+
+    <div id="rc-result" class="result-card"></div>
+  </div>
+
+  <div id="rc-labels"></div>
+
+  <div class="sub-title">Note for Teams or Sheltermate</div>
+  <div class="note-box" id="rc-note"></div>
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" data-copy="rc-note" type="button">Copy note</button>
+  </div>
+</section>
+</div>
+
+<!-- ============================ MODE 3: WEAN ============================ -->
+<div id="panel-wean" class="hidden">
+<section class="sec">
+  <h3 class="sec-title">Wean and discharge</h3>
+  <p class="sec-intro">On medication 28 days or less, stop at exit and dispense nothing. More than 28 days, the tool builds an achievable ladder from the strengths LDH stocks, then writes the labels and the waiver text.</p>
+
+  <div class="calc-card">
+    <div class="calc-form">
+      <div class="form-group-label">Trazodone</div>
+      <div class="field">
+        <label for="wn-traz-on">On trazodone?</label>
+        <select id="wn-traz-on">
+          <option value="yes" selected>Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div class="field" id="wn-traz-mgkg-field">
+        <label for="wn-traz-mgkg">Shelter dose (mg/kg per dose, BID)</label>
+        <input type="number" id="wn-traz-mgkg" min="0.5" max="15" step="0.5" value="6">
+        <div class="field-help" id="wn-traz-help"></div>
+      </div>
+      <div class="field" id="wn-traz-dose-field">
+        <label for="wn-traz-dose">Dose actually given (per dose)</label>
+        <select id="wn-traz-dose"></select>
+      </div>
+      <div class="field" id="wn-traz-days-field">
+        <label for="wn-traz-days">Time on trazodone</label>
+        <select id="wn-traz-days">
+          <option value="short">28 days or less</option>
+          <option value="long" selected>More than 28 days</option>
+        </select>
+      </div>
+
+      <div class="form-group-label">Second-line add-on</div>
+      <div class="field">
+        <label for="wn-addon">Add-on drug</label>
+        <select id="wn-addon">
+          <option value="none" selected>None</option>
+          <option value="gabapentin">Gabapentin</option>
+          <option value="pregabalin">Pregabalin</option>
+        </select>
+      </div>
+      <div class="field" id="wn-addon-mgkg-field">
+        <label for="wn-addon-mgkg">Shelter dose (mg/kg per dose, BID)</label>
+        <input type="number" id="wn-addon-mgkg" min="0.5" max="60" step="0.5" value="20">
+        <div class="field-help" id="wn-addon-help"></div>
+      </div>
+      <div class="field" id="wn-addon-dose-field">
+        <label for="wn-addon-dose">Dose actually given (per dose)</label>
+        <select id="wn-addon-dose"></select>
+      </div>
+      <div class="field" id="wn-addon-days-field">
+        <label for="wn-addon-days">Time on add-on</label>
+        <select id="wn-addon-days">
+          <option value="short">28 days or less</option>
+          <option value="long" selected>More than 28 days</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub-title">Weaning schedule</div>
+  <p class="sec-intro">Each week is 7 days. Override any week from the dropdown if clinical judgement calls for a different step &mdash; the labels, quantities and waiver text all recalculate.</p>
+  <div id="wean-result"></div>
+
+  <div class="sub-title">Dispensing labels and quantities</div>
+  <p class="sec-intro">One label per drug strength. A strength used across several weeks stays on a single label; a change of strength starts a new one.</p>
+  <div id="label-result"></div>
+
+  <div class="sub-title">Note and waiver text for Teams or Sheltermate</div>
+  <div class="note-box" id="wean-note"></div>
+  <div class="btn-row no-print">
+    <button class="btn btn-primary" data-copy="wean-note" type="button">Copy note</button>
+    <button class="btn" id="print-btn" type="button">Print labels and schedule</button>
+  </div>
+</section>
+</div>
+
+<!-- ============================ PATHWAY ============================ -->
+<section class="sec">
+  <h3 class="sec-title">Treatment pathway</h3>
+  <div class="fc">
+
+    <div class="fc-box fc-gray">
+      <span class="fc-step-label">Step 1</span>
+      <div class="fc-box-title">Dog flagged for shelter stress</div>
+      <div class="fc-box-sub">Attendant, trainer or vet flags. Shelter Vet reviews the dog in pen, reads the observation chart, talks to the attendants, records an initial FAS score.</div>
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-box fc-coral">
+      <span class="fc-step-label">Step 2</span>
+      <div class="fc-box-title">Check for a diversion first</div>
+      <ul class="fc-box-list">
+        <li><strong>Court hold?</strong> Refer to the behaviour department (Q chat for NM, CB Court Hold AAs chat for CB) for a medication trial</li>
+        <li><strong>Already on behaviour medication at admission?</strong> Behaviour department takes over medicating and monitoring</li>
+      </ul>
+      <div class="fc-action-row">
+        <strong>Exception:</strong> welfare concerns, self-trauma or property damage &mdash; the Shelter Vet team starts medication now, then refers for follow-up.
+      </div>
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-box fc-teal">
+      <span class="fc-step-label">Step 3 &middot; First line</span>
+      <div class="fc-box-title">Trazodone 6 mg/kg BID</div>
+      <ul class="fc-box-list">
+        <li>Same starting dose for every dog, regardless of size</li>
+        <li>Reassess in 48 to 72 hours, between 10am and 3pm</li>
+        <li>If ineffective, titrate up by 25%</li>
+        <li>Reassess at each step</li>
+        <li class="fc-cap-line">Ceiling 10 mg/kg BID</li>
+      </ul>
+      <div class="fc-action-row">
+        <strong>Above the ceiling:</strong> refer to the behaviour department or behaviour veterinarian for welfare concerns.
+      </div>
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-box fc-blue">
+      <span class="fc-step-label">Step 4</span>
+      <div class="fc-box-title">Still stressed at the trazodone ceiling?</div>
+      <div class="fc-box-sub">Moderate to severe shelter stress &mdash; add one second-line drug.</div>
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-pair">
+      <div class="fc-box fc-purple">
+        <span class="fc-step-label">Step 5A &middot; Add-on</span>
+        <div class="fc-box-title">Gabapentin</div>
+        <ul class="fc-box-list">
+          <li>Start 20 mg/kg BID</li>
+          <li>Several days to therapeutic effect &mdash; do not judge it early</li>
+          <li>Titrate to 30 to 40 mg/kg BID if needed</li>
+          <li class="fc-cap-line">Ceiling 40 mg/kg BID</li>
+        </ul>
+      </div>
+      <div class="fc-box fc-purple">
+        <span class="fc-step-label">Step 5B &middot; Add-on</span>
+        <div class="fc-box-title">Pregabalin</div>
+        <ul class="fc-box-list">
+          <li>3 to 5 mg/kg BID</li>
+          <li>Only 25 mg and 75 mg capsules available</li>
+          <li>Capsules cannot be opened or split</li>
+          <li class="fc-cap-line">Ceiling 5 mg/kg BID</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fc-callout">
+      <strong>Above either ceiling:</strong> refer to the behaviour department or behaviour veterinarian rather than titrating further.
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-box fc-amber">
+      <span class="fc-step-label">Step 6 &middot; At 4 weeks</span>
+      <div class="fc-box-title">Consider long-term medication</div>
+      <div class="fc-box-sub">A dog still on trazodone at 4 weeks should be considered for long-term behaviour medication rather than continued short-acting treatment. Consult Dr Leonie Poulter, Behaviour Department Veterinarian, for case management.</div>
+    </div>
+    <div class="fc-arrow-down"></div>
+
+    <div class="fc-box fc-gray">
+      <span class="fc-step-label">Step 7 &middot; At exit</span>
+      <div class="fc-box-title">Adoption, foster or rescue</div>
+      <div class="fc-box-sub">On medication 28 days or less: stop at exit, no weaning. More than 28 days: dispense the weaning schedule and have the discharge conversation.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ RECOGNITION ============================ -->
+<section class="sec">
+  <h3 class="sec-title">Recognising shelter stress</h3>
+  <div class="card-grid">
+    <div class="ref-card">
+      <h4>Clinical signs</h4>
+      <ul class="chip-list" id="all-signs"></ul>
+    </div>
+    <div class="ref-card">
+      <h4>How a dog gets flagged</h4>
+      <ul>
+        <li>Animal attendants or behaviour trainers post in the <strong>Attendants and Behaviour Department</strong> chat on Teams</li>
+        <li>Or flag the Shelter Vets directly on Teams</li>
+        <li>Or place a note on the <strong>S and I board</strong> for assessment</li>
+        <li>A Shelter Veterinarian then reviews the dog in pen, taking in the observation charts and attendant comments</li>
+      </ul>
+      <p><strong>Who does what:</strong> behaviour vets advise on case management; shelter vets follow this procedure and escalate concerns; behaviour trainers and animal attendants flag dogs and help monitor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MONITORING ============================ -->
+<section class="sec">
+  <h3 class="sec-title">Monitoring in the shelter</h3>
+  <div class="card-grid">
+    <div class="ref-card">
+      <h4>Reassessment schedule</h4>
+      <ul>
+        <li><strong>Every 48 to 72 hours</strong> by a Shelter Veterinarian until the signs start to resolve</li>
+        <li>Then <strong>weekly</strong> Shelter Veterinarian reassessment</li>
+        <li>Check in <strong>between 10am and 3pm</strong> so short-acting medications are onboard when the dog is assessed</li>
+      </ul>
+    </div>
+    <div class="ref-card">
+      <h4>What a reassessment covers</h4>
+      <ul>
+        <li>Review the FAS scores on the green Shelter Stress Medication Sheet, scored by the behaviour team</li>
+        <li>Read the daily observation notes on the pen</li>
+        <li>Talk to the animal attendants</li>
+        <li>FAS ladder: use the laminated chart in the sick and injured file box</li>
+      </ul>
+      <p>Concerned about progress? Liaise with the behaviour department or behaviour veterinarian in the <strong>Shelter Stress Cases</strong> chat on Teams.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DOCUMENTATION ============================ -->
+<section class="sec">
+  <h3 class="sec-title">Documentation and discharge</h3>
+  <div class="card-grid">
+    <div class="ref-card">
+      <h4>Once the dog is on a set dose</h4>
+      <ul class="checklist">
+        <li>Update the Sheltermate indemnity with the weaning schedule</li>
+        <li>At adoption, foster or rescue, record the medication dispensed on Sheltermate so follow-up is possible</li>
+      </ul>
+      <p>The Customer Experience or Pathways team flags the dog for a vet discussion at the point of exit.</p>
+    </div>
+    <div class="ref-card">
+      <h4>What to tell the adopter, carer or rescue</h4>
+      <ul>
+        <li>Walk through the weaning schedule week by week and hand over the labelled medication</li>
+        <li>Monitor for any increase in anxiety, change in behaviour, or change in physical health</li>
+        <li>If the dog deteriorates, stop reducing and get in touch rather than pushing on with the schedule</li>
+        <li>Ongoing advice: <strong>Post-Adoption Behaviour Support</strong> at The Lost Dogs' Home, who liaise with the behaviour veterinarian if needed</li>
+        <li>Urgent help: <strong>The Lost Dogs' Home Veterinary Hospital</strong></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DEVIATIONS ============================ -->
+<section class="sec" id="deviations">
+  <h3 class="sec-title">Changes from SOP v1.0</h3>
+  <p class="sec-intro">This tool does not follow SOP v1.0 exactly. The differences below are proposed and are for discussion with the behaviour department before the SOP is reissued.</p>
+  <table class="dev-table">
+    <thead><tr><th>Topic</th><th>SOP v1.0</th><th>This tool</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Starting drug by size</td>
+        <td>Smaller dogs may do better on pregabalin 3&ndash;5 mg/kg BID, plus or minus Zylkene at 2&ndash;3 times standard dosing</td>
+        <td>Trazodone 6 mg/kg BID first line for every dog regardless of size. Pregabalin becomes a second-line add-on. <strong>Zylkene removed.</strong></td>
+      </tr>
+      <tr>
+        <td>Trazodone ceiling</td>
+        <td>Titrate up to 6&ndash;8 mg/kg BID</td>
+        <td>Titrate up by 25% steps to a ceiling of <strong>10 mg/kg BID</strong> before referring on</td>
+      </tr>
+      <tr>
+        <td>Mirtazapine</td>
+        <td>May be considered first line at 1&ndash;1.5 mg/kg SID for fearful, shut-down or inappetent dogs</td>
+        <td><strong>Removed</strong> from this pathway</td>
+      </tr>
+      <tr>
+        <td>When to wean</td>
+        <td>Not specified by duration &mdash; 4 weeks dispensed at exit</td>
+        <td>Duration decides: <strong>28 days or less, no weaning</strong>, stop at exit. More than 28 days, wean.</td>
+      </tr>
+      <tr>
+        <td>Weaning shape</td>
+        <td>Hold 1 week at the shelter dose, then reduce by a quarter each week over 3 weeks</td>
+        <td>Reduce by <strong>25% per week from week 1</strong>, snapped to strengths that actually exist, to a maximum of 4 dosing weeks</td>
+      </tr>
+      <tr>
+        <td>Pregabalin weaning</td>
+        <td>Not specified</td>
+        <td>Capsules cannot be split, so the dose does not change: <strong>full dose BID for 2 weeks, then the same capsule SID for 2 weeks, then stop</strong></td>
+      </tr>
+      <tr>
+        <td>Long-term medication</td>
+        <td>Not specified</td>
+        <td>New trigger: a dog on trazodone at <strong>4 weeks</strong> should be considered for long-term medication &mdash; consult Dr Leonie Poulter for case management</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="footnote">
+  For veterinary use only. Decision support, not a substitute for clinical judgement. Doses must be checked against the dog's current weight and clinical status before dispensing.<br><br>
+  &copy; 2026 Juliana Xue. All rights reserved.<br>
+  This work is the intellectual property of Juliana Xue and may not be copied, modified, distributed or used without her express written permission, except by her current employer for as long as she remains engaged there.
+</div>
+
+</div>
+
+<script>
+/* ==================================================================
+   Drug definitions - the strengths LDH actually stocks
+   ================================================================== */
+var DRUGS = {
+  trazodone: {
+    name: 'Trazodone',
+    units: [ { mg: 100, form: 'tablet', splittable: true } ],
+    floor: 25,
+    startMgKg: 6,
+    capMgKg: 10,
+    rangeText: 'start 6 mg/kg BID, ceiling 10 mg/kg BID',
+    weanStyle: 'ladder'
+  },
+  gabapentin: {
+    name: 'Gabapentin',
+    units: [
+      { mg: 100, form: 'capsule', splittable: false },
+      { mg: 300, form: 'capsule', splittable: false },
+      { mg: 600, form: 'tablet', splittable: true },
+      { mg: 800, form: 'tablet', splittable: true }
+    ],
+    floor: 100,
+    startMgKg: 20,
+    capMgKg: 40,
+    rangeText: 'start 20 mg/kg BID, titrate to 30-40 mg/kg BID, ceiling 40 mg/kg BID',
+    weanStyle: 'ladder',
+    slowOnset: true
+  },
+  pregabalin: {
+    name: 'Pregabalin',
+    units: [
+      { mg: 25, form: 'capsule', splittable: false },
+      { mg: 75, form: 'capsule', splittable: false }
+    ],
+    floor: 25,
+    startMgKg: 4,
+    capMgKg: 5,
+    rangeText: '3-5 mg/kg BID, ceiling 5 mg/kg BID',
+    weanStyle: 'frequency'
+  }
+};
+
+var SIGNS = [
+  { id: 'pacing',      label: 'Stereotypical pacing or circling', group: 'arousal' },
+  { id: 'jumping',     label: 'Jumping',                          group: 'arousal' },
+  { id: 'vocal',       label: 'Excessive vocalisation',           group: 'arousal' },
+  { id: 'destruction', label: 'Excessive destruction',            group: 'arousal' },
+  { id: 'pendamage',   label: 'Property or pen damage',           group: 'arousal' },
+  { id: 'selftrauma',  label: 'Self-trauma or injury in pen',     group: 'arousal' },
+  { id: 'reactivity',  label: 'Increased reactivity to people or dogs', group: 'arousal' },
+  { id: 'panting',     label: 'Panting',                          group: 'arousal' },
+  { id: 'poopainting', label: 'Poo painting',                     group: 'arousal' },
+  { id: 'hiding',      label: 'Hiding or avoidance',              group: 'fear' },
+  { id: 'social',      label: 'Decreased need for social contact', group: 'fear' },
+  { id: 'inappetence', label: 'Inappetence',                      group: 'fear' },
+  { id: 'weightloss',  label: 'Weight loss',                      group: 'fear' }
+];
+
+var MAX_WEAN_WEEKS = 4;
+var EPS = 0.001;
+
+/* ==================================================================
+   Formatting
+   ================================================================== */
+function formatNum(n, maxDecimals) {
+  if (!isFinite(n)) return '0';
+  return parseFloat(n.toFixed(maxDecimals)).toString();
+}
+
+function formatMg(mg) {
+  if (!isFinite(mg) || mg <= 0) return '0';
+  if (mg === Math.round(mg)) return Math.round(mg).toString();
+  return parseFloat(mg.toFixed(1)).toString();
+}
+
+function fraction(n) {
+  if (n === 0) return '0';
+  if (Math.abs(n - Math.round(n)) < EPS) return Math.round(n).toString();
+  var whole = Math.floor(n + EPS);
+  var frac = n - whole;
+  var fracStr;
+  if (Math.abs(frac - 0.25) < 0.01) fracStr = '¼';
+  else if (Math.abs(frac - 0.5) < 0.01) fracStr = '½';
+  else if (Math.abs(frac - 0.75) < 0.01) fracStr = '¾';
+  else return parseFloat(n.toFixed(2)).toString();
+  return whole > 0 ? whole + fracStr : fracStr;
+}
+
+/* singular for anything up to and including one unit: "3/4 tablet", "1 capsule" */
+function unitWord(count, word) {
+  return count <= 1 + EPS ? word : word + 's';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function auDate(iso) {
+  if (!iso) return '__ / __ / ____';
+  var p = iso.split('-');
+  if (p.length !== 3) return iso;
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+
+function joinList(items) {
+  if (!items.length) return '';
+  if (items.length === 1) return items[0];
+  return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+}
+
+/* ==================================================================
+   Achievable amounts
+
+   An option is one or two stocked strengths, each with a whole or
+   quarter count. Where several combinations give the same milligrams
+   the cheapest one wins:
+     +3 for a second strength, +2 for a half tablet, +3 for a quarter,
+     +1 per unit the dog has to swallow.
+   That makes 600 mg render as one 600 mg tablet rather than six 100 mg
+   capsules, and keeps 200 mg as two capsules rather than a quarter of
+   an 800 mg tablet.
+   ================================================================== */
+function optionCost(parts) {
+  var cost = (parts.length - 1) * 3;
+  parts.forEach(function (p) {
+    var frac = p.count - Math.floor(p.count + EPS);
+    if (Math.abs(frac - 0.5) < 0.01) cost += 2;
+    else if (frac > EPS) cost += 3;
+    cost += p.count;
+  });
+  return cost;
+}
+
+function buildOptions(drugKey, capsulesOnly) {
+  var drug = DRUGS[drugKey];
+  var units = capsulesOnly
+    ? drug.units.filter(function (u) { return !u.splittable; })
+    : drug.units;
+  var byMg = {};
+
+  function add(mg, parts) {
+    if (mg <= 0 || mg > 4000) return;
+    var key = Math.round(mg * 100) / 100;
+    var cost = optionCost(parts);
+    var existing = byMg[key];
+    if (!existing || cost < existing.cost - EPS) {
+      byMg[key] = { mg: key, parts: parts, cost: cost };
+    }
+  }
+
+  units.forEach(function (u) {
+    if (u.splittable) {
+      for (var q = 1; q <= 24; q++) add((q / 4) * u.mg, [{ unit: u, count: q / 4 }]);
+    } else {
+      for (var n = 1; n <= 12; n++) add(n * u.mg, [{ unit: u, count: n }]);
+    }
+  });
+
+  for (var i = 0; i < units.length; i++) {
+    for (var j = i + 1; j < units.length; j++) {
+      for (var a = 1; a <= 6; a++) {
+        for (var b = 1; b <= 6; b++) {
+          add(a * units[i].mg + b * units[j].mg,
+              [{ unit: units[i], count: a }, { unit: units[j], count: b }]);
+        }
+      }
+    }
+  }
+
+  var list = [];
+  for (var k in byMg) { if (byMg.hasOwnProperty(k)) list.push(byMg[k]); }
+  list.sort(function (x, y) { return x.mg - y.mg; });
+  list.forEach(function (o) { o.label = partsLabel(o.parts); });
+  return list;
+}
+
+function partsLabel(parts) {
+  return parts.map(function (p) {
+    return fraction(p.count) + ' × ' + p.unit.mg + ' mg ' + unitWord(p.count, p.unit.form);
+  }).join(' + ');
+}
+
+var OPTIONS = {
+  trazodone: buildOptions('trazodone'),
+  gabapentin: buildOptions('gabapentin'),
+  pregabalin: buildOptions('pregabalin')
+};
+
+/* Amounts that can be made from unsplittable capsules alone. Used for the tail
+   of a taper, where the dose has to land on whole capsules - 600 mg belongs
+   here as 2 x 300 mg capsules even though it normally renders as one tablet. */
+var CAPSULE_OPTIONS = {
+  trazodone: buildOptions('trazodone', true),
+  gabapentin: buildOptions('gabapentin', true),
+  pregabalin: buildOptions('pregabalin', true)
+};
+
+/* all representations of a given milligram amount, cheapest first */
+function representations(drugKey, mg) {
+  var drug = DRUGS[drugKey];
+  var out = [];
+  drug.units.forEach(function (u) {
+    var raw = mg / u.mg;
+    var step = u.splittable ? 0.25 : 1;
+    var n = Math.round(raw / step) * step;
+    if (n > 0 && Math.abs(n * u.mg - mg) < EPS && n <= 12) {
+      out.push({ mg: mg, parts: [{ unit: u, count: n }], cost: optionCost([{ unit: u, count: n }]) });
+    }
+  });
+  out.sort(function (a, b) { return a.cost - b.cost; });
+  out.forEach(function (o) { o.label = partsLabel(o.parts); });
+  return out;
+}
+
+function optionByMg(drugKey, mg) {
+  var list = OPTIONS[drugKey];
+  for (var i = 0; i < list.length; i++) {
+    if (Math.abs(list[i].mg - mg) < EPS) return list[i];
+  }
+  return null;
+}
+
+/*
+  Nearest achievable amount to target. Ties round DOWN.
+  preferStrengths keeps the previous week on the same tablet where the
+  same milligrams can be made from it, so one label covers both weeks.
+*/
+function pickNearest(drugKey, target, opts) {
+  opts = opts || {};
+  var pool = opts.wholeCapsOnly ? CAPSULE_OPTIONS[drugKey] : OPTIONS[drugKey];
+
+  if (opts.maxMg !== undefined) pool = pool.filter(function (o) { return o.mg <= opts.maxMg - EPS; });
+  if (!pool.length) return null;
+
+  var best = null;
+  pool.forEach(function (o) {
+    if (opts.roundUp && o.mg < target - EPS) return;
+    if (!best) { best = o; return; }
+    var d = Math.abs(o.mg - target), bd = Math.abs(best.mg - target);
+    if (d < bd - EPS) best = o;
+    else if (Math.abs(d - bd) < EPS && o.mg < best.mg) best = o;
+  });
+  if (!best && opts.roundUp) best = pool[pool.length - 1];
+  if (!best) return null;
+
+  if (opts.preferStrengths && opts.preferStrengths.length) {
+    var reuse = representations(drugKey, best.mg).filter(function (o) {
+      return o.parts.every(function (p) { return opts.preferStrengths.indexOf(p.unit.mg) !== -1; });
+    });
+    if (reuse.length) return reuse[0];
+  }
+  return best;
+}
+
+/* ==================================================================
+   Weaning ladders
+   ================================================================== */
+function frequencyLadder(startOption, reason) {
+  return {
+    weeks: [
+      { week: 1, option: startOption, perDay: 2, freq: 'BID' },
+      { week: 2, option: startOption, perDay: 2, freq: 'BID' },
+      { week: 3, option: startOption, perDay: 1, freq: 'SID' },
+      { week: 4, option: startOption, perDay: 1, freq: 'SID' }
+    ],
+    note: reason,
+    truncated: false
+  };
+}
+
+function doseLadder(drugKey, startOption) {
+  var drug = DRUGS[drugKey];
+  var start = startOption.mg;
+
+  if (start <= drug.floor + EPS) {
+    return frequencyLadder(startOption,
+      'Already at the smallest available unit (' + formatMg(drug.floor)
+      + ' mg), so the dose cannot be reduced. Halve the frequency instead.');
+  }
+
+  var hasWholeCaps = drug.units.some(function (u) { return !u.splittable; });
+  var step = start * 0.25;
+  var weeks = [];
+  var prevMg = start;
+  var prevStrengths = startOption.parts.map(function (p) { return p.unit.mg; });
+
+  function push(opt) {
+    weeks.push({ week: weeks.length + 1, option: opt, perDay: 2, freq: 'BID' });
+    prevMg = opt.mg;
+    prevStrengths = opt.parts.map(function (p) { return p.unit.mg; });
+  }
+
+  [0.75, 0.50, 0.25].forEach(function (pct) {
+    if (weeks.length >= MAX_WEAN_WEEKS) return;
+    var target = start * pct;
+    var opt = (pct <= 0.25 + EPS && hasWholeCaps)
+      /* tail of the taper: whole capsules only, and never drop below the
+         planned target - round up to the nearest achievable capsule dose */
+      ? pickNearest(drugKey, target, { wholeCapsOnly: true, roundUp: true, maxMg: prevMg })
+      : pickNearest(drugKey, target, { maxMg: prevMg, preferStrengths: prevStrengths });
+    if (opt && opt.mg < prevMg - EPS) push(opt);
+  });
+
+  /* The three rungs above aim for 75/50/25%. Where a capsule size forced the
+     25% rung to round UP, keep stepping down until we are at or below 25% of
+     the shelter dose - that is the extra week a 600 mg start needs and a
+     400 mg start does not. Never descend past 25% just because weeks remain. */
+  var tailFloor = Math.max(drug.floor, start * 0.25);
+  while (weeks.length < MAX_WEAN_WEEKS && prevMg > tailFloor + EPS) {
+    var target2 = Math.max(drug.floor, prevMg - step);
+    var next = hasWholeCaps
+      ? pickNearest(drugKey, target2, { wholeCapsOnly: true, roundUp: true, maxMg: prevMg })
+      : pickNearest(drugKey, target2, { maxMg: prevMg, preferStrengths: prevStrengths });
+    if (!next || next.mg >= prevMg - EPS) break;
+    push(next);
+  }
+
+  /* started close to the floor and only got one or two rungs - finish on SID */
+  while (weeks.length > 0 && weeks.length < 3) {
+    var last = weeks[weeks.length - 1];
+    weeks.push({ week: weeks.length + 1, option: last.option, perDay: 1, freq: 'SID' });
+  }
+
+  var truncated = prevMg > tailFloor + EPS;
+  return {
+    weeks: weeks,
+    note: truncated
+      ? 'Four-week cap reached before the taper got down to a quarter of the shelter dose. The last step is '
+        + Math.round((prevMg / start) * 100) + '% of the shelter dose, so check the dog is settled before stopping.'
+      : '',
+    truncated: truncated
+  };
+}
+
+function buildLadder(drugKey, startOption) {
+  if (DRUGS[drugKey].weanStyle === 'frequency') {
+    return frequencyLadder(startOption,
+      'Pregabalin capsules cannot be opened or split, so the dose stays the same and the frequency halves.');
+  }
+  return doseLadder(drugKey, startOption);
+}
+
+/* ==================================================================
+   Labels: one per strength, listing every week that uses it
+   ================================================================== */
+function buildLabels(drugKey, ladder) {
+  var drug = DRUGS[drugKey];
+  var groups = [];
+
+  ladder.weeks.forEach(function (w) {
+    w.option.parts.forEach(function (p) {
+      var g = null;
+      for (var i = 0; i < groups.length; i++) {
+        if (groups[i].unit.mg === p.unit.mg) { g = groups[i]; break; }
+      }
+      if (!g) { g = { unit: p.unit, lines: [], qty: 0 }; groups.push(g); }
+      g.lines.push({
+        week: w.week,
+        text: 'Give ' + fraction(p.count) + ' ' + unitWord(p.count, p.unit.form)
+              + ' by mouth ' + (w.perDay === 2 ? 'twice' : 'once') + ' daily for 7 days'
+      });
+      g.qty += p.count * w.perDay * 7;
+    });
+  });
+
+  groups.forEach(function (g) {
+    g.qty = Math.ceil(g.qty - EPS);
+    g.title = drug.name + ' ' + g.unit.mg + ' mg ' + g.unit.form + 's';
+  });
+  return groups;
+}
+
+/* ==================================================================
+   Shared state and helpers
+   ================================================================== */
+var mode = 'start';
+var overrides = {};
+var startOverride = {};
+
+function el(id) { return document.getElementById(id); }
+function val(id) { return el(id).value.trim(); }
+
+function patientInfo() {
+  return {
+    weight: parseFloat(el('weight').value),
+    name: val('dogname'),
+    id: val('dogid'),
+    vet: val('vetinit'),
+    date: val('notedate'),
+    location: val('location')
+  };
+}
+
+function validWeight(w) { return isFinite(w) && w >= 0.5 && w <= 100; }
+
+function noteHeader(p, title) {
+  var lines = [];
+  lines.push(title);
+  lines.push('Vet initial: ' + (p.vet || '____'));
+  lines.push('Date: ' + auDate(p.date));
+  lines.push('Patient ID: ' + (p.id || '____________')
+           + (p.name ? '   Name: ' + p.name : '')
+           + '   Weight: ' + formatNum(p.weight, 1) + ' kg');
+  if (p.location) lines.push('Location: ' + p.location);
+  lines.push('');
+  return lines;
+}
+
+function doseSentence(drugKey, opt, weight) {
+  return DRUGS[drugKey].name.toLowerCase() + ' ' + formatMg(opt.mg) + ' mg ('
+       + opt.label + ') PO BID, ' + formatNum(opt.mg / weight, 2) + ' mg/kg';
+}
+
+function populateDoseSelect(selectEl, drugKey, chosenMg) {
+  var html = '';
+  OPTIONS[drugKey].forEach(function (o) {
+    if (o.mg > 3200) return;
+    html += '<option value="' + o.mg + '"' + (Math.abs(o.mg - chosenMg) < EPS ? ' selected' : '') + '>'
+          + formatMg(o.mg) + ' mg — ' + o.label + '</option>';
+  });
+  selectEl.innerHTML = html;
+}
+
+function doseBlock(drugKey, opt, weight, mgkgTarget, title, extraClass) {
+  var drug = DRUGS[drugKey];
+  var actual = opt.mg / weight;
+  var warn = '';
+  if (actual > drug.capMgKg + 0.05) {
+    warn = '<div class="tablet-warn">This delivers ' + formatNum(actual, 2) + ' mg/kg, above the '
+         + drug.capMgKg + ' mg/kg ceiling. Refer to the behaviour department or behaviour veterinarian.</div>';
+  } else if (mgkgTarget && Math.abs(actual - mgkgTarget) / mgkgTarget > 0.15) {
+    warn = '<div class="tablet-warn">Nearest stocked strength delivers ' + formatNum(actual, 2)
+         + ' mg/kg against a target of ' + formatNum(mgkgTarget, 2)
+         + ' mg/kg. Confirm this is acceptable for this dog.</div>';
+  }
+  return '<div class="dose-block ' + (extraClass || '') + '">'
+       + '<div class="dose-block-title">' + esc(title) + '</div>'
+       + '<div class="dose-block-value">' + esc(drug.name) + ' ' + formatMg(opt.mg) + ' mg twice daily</div>'
+       + '<div class="dose-block-mg">' + formatNum(actual, 2) + ' mg/kg per dose for a '
+       + formatNum(weight, 1) + ' kg dog</div>'
+       + '<div class="dose-block-tablet"><span class="tab-label">Give</span>' + opt.label + '</div>'
+       + warn + '</div>';
+}
+
+/* ==================================================================
+   Mode 1 - start medication
+   ================================================================== */
+function renderSigns() {
+  ['arousal', 'fear'].forEach(function (g) {
+    var html = '';
+    SIGNS.filter(function (s) { return s.group === g; }).forEach(function (s) {
+      html += '<li><label><input type="checkbox" class="sign-cb" value="' + s.id + '"> '
+            + esc(s.label) + '</label></li>';
+    });
+    el('signs-' + g).innerHTML = html;
+  });
+  el('all-signs').innerHTML = SIGNS.map(function (s) {
+    return '<li class="chip">' + esc(s.label) + '</li>';
+  }).join('');
+  Array.prototype.forEach.call(document.querySelectorAll('.sign-cb'), function (cb) {
+    cb.addEventListener('change', recalcStart);
+  });
+}
+
+function chosenSigns() {
+  var ids = [];
+  Array.prototype.forEach.call(document.querySelectorAll('.sign-cb'), function (cb) {
+    if (cb.checked) ids.push(cb.value);
+  });
+  return SIGNS.filter(function (s) { return ids.indexOf(s.id) !== -1; });
+}
+
+function signSentence(signs) {
+  var arousal = signs.filter(function (s) { return s.group === 'arousal'; })
+                     .map(function (s) { return s.label.toLowerCase(); });
+  var fear = signs.filter(function (s) { return s.group === 'fear'; })
+                  .map(function (s) { return s.label.toLowerCase(); });
+  var bits = [];
+  if (arousal.length) bits.push('arousal signs (' + joinList(arousal) + ')');
+  if (fear.length) bits.push('fear signs (' + joinList(fear) + ')');
+  if (!bits.length) return 'Patient was flagged exhibiting shelter stress behaviour.';
+  return 'Patient was flagged exhibiting shelter stress behaviour, including ' + joinList(bits) + '.';
+}
+
+function recalcStart(rebuild) {
+  var p = patientInfo();
+  if (!validWeight(p.weight)) {
+    el('start-result').innerHTML = '<p class="muted">Enter a valid weight between 0.5 and 100 kg.</p>';
+    el('start-note').textContent = '';
+    return;
+  }
+
+  var drugKey = val('start-drug');
+  var drug = DRUGS[drugKey];
+  var mgkg = parseFloat(el('start-mgkg').value);
+  if (!isFinite(mgkg) || mgkg <= 0) mgkg = drug.startMgKg;
+
+  el('start-help').textContent = drug.name + ': ' + drug.rangeText + '. Target '
+    + formatMg(mgkg * p.weight) + ' mg per dose.';
+
+  var opt;
+  if (rebuild === true || startOverride['start:' + drugKey] === undefined) {
+    opt = pickNearest(drugKey, mgkg * p.weight, {});
+    startOverride['start:' + drugKey] = opt ? opt.mg : 0;
+    populateDoseSelect(el('start-dose'), drugKey, startOverride['start:' + drugKey]);
+  } else {
+    opt = optionByMg(drugKey, startOverride['start:' + drugKey]);
+    if (!opt) { opt = pickNearest(drugKey, mgkg * p.weight, {}); startOverride['start:' + drugKey] = opt.mg; }
+  }
+
+  var html = doseBlock(drugKey, opt, p.weight, mgkg, 'Starting dose',
+                       (opt.mg / p.weight) > drug.capMgKg + 0.05 ? 'max-dose' : '');
+
+  html += '<div class="banner banner-info"><h4>Next step</h4>'
+        + '<p>Schedule reassessment by the sick and injured vet in <strong>48 to 72 hours</strong>, '
+        + 'checked between 10am and 3pm so short-acting medication is onboard.</p>'
+        + (drug.slowOnset
+            ? '<p>Gabapentin can take several days to reach therapeutic effect. Do not judge it as ineffective too early.</p>'
+            : '')
+        + '</div>';
+
+  if (drugKey !== 'trazodone') {
+    html += '<div class="banner banner-warning"><h4>Not first line</h4>'
+          + '<p>Trazodone at 6 mg/kg BID is first line for every dog regardless of size. '
+          + esc(drug.name) + ' is normally a second-line add-on. Record the reason for starting here instead.</p></div>';
+  }
+
+  var signs = chosenSigns();
+  if (!signs.length) {
+    html += '<div class="banner banner-warning"><h4>No signs recorded</h4>'
+          + '<p>Tick the signs the dog is showing so the note and the medication sheet describe the presenting problem.</p></div>';
+  }
+
+  el('start-result').innerHTML = html;
+
+  /* note */
+  var lines = noteHeader(p, 'SHELTER STRESS - MEDICATION STARTED');
+  lines.push(signSentence(signs));
+  var fas = val('start-fas');
+  lines.push('Initial FAS score: ' + (fas || '____'));
+  lines.push('');
+  lines.push('Elected to start ' + doseSentence(drugKey, opt, p.weight) + '.');
+  lines.push('');
+  lines.push('Green Shelter Stress Medication Sheet placed on pen. Added to the sick and');
+  lines.push('injured list. Shelter stress medication waiver added to Sheltermate.');
+  lines.push('Reassessment by the S and I vet in 48-72 hours, between 10am and 3pm.');
+  el('start-note').textContent = lines.join('\n');
+}
+
+/* ==================================================================
+   Mode 2 - recheck
+   ================================================================== */
+function recalcRecheck() {
+  var p = patientInfo();
+  if (!validWeight(p.weight)) {
+    el('rc-result').innerHTML = '<p class="muted">Enter a valid weight between 0.5 and 100 kg.</p>';
+    el('rc-labels').innerHTML = '';
+    el('rc-note').textContent = '';
+    return;
+  }
+
+  var drugKey = val('rc-drug');
+  var drug = DRUGS[drugKey];
+  var mgkg = parseFloat(el('rc-mgkg').value);
+  if (!isFinite(mgkg) || mgkg <= 0) mgkg = drug.startMgKg;
+
+  var addonKey = val('rc-addon');
+  var hasAddon = addonKey !== 'none';
+  el('rc-addon-mgkg-field').classList.toggle('dimmed', !hasAddon);
+  el('rc-addon-mgkg').disabled = !hasAddon;
+  var addonMgKg = parseFloat(el('rc-addon-mgkg').value);
+  if (!isFinite(addonMgKg) || addonMgKg <= 0) addonMgKg = hasAddon ? DRUGS[addonKey].startMgKg : 0;
+
+  var response = val('rc-response');
+  var weeksOn = parseInt(val('rc-weeks'), 10);
+  var currentOpt = pickNearest(drugKey, mgkg * p.weight, {});
+
+  el('rc-help').textContent = drug.name + ': ' + drug.rangeText + '. Currently '
+    + formatMg(currentOpt.mg) + ' mg per dose (' + currentOpt.label + ').';
+
+  var atCap = mgkg >= drug.capMgKg - EPS;
+  var addonAtCap = hasAddon && addonMgKg >= DRUGS[addonKey].capMgKg - EPS;
+
+  var html = doseBlock(drugKey, currentOpt, p.weight, mgkg, 'Current dose');
+  var planLines = [];
+  var newDoses = [];   /* {drugKey, opt, mgkg} for the label section */
+
+  if (response === 'managed') {
+    html += '<div class="banner banner-success"><h4>Maintain</h4>'
+          + '<p>Keep ' + esc(drug.name.toLowerCase()) + ' at ' + formatNum(mgkg, 2)
+          + ' mg/kg BID. Move reassessment to <strong>weekly</strong> now that the signs are resolving.</p></div>';
+    planLines.push('Plan: maintain ' + doseSentence(drugKey, currentOpt, p.weight) + '.');
+    planLines.push('Reassess weekly while the dog remains in the shelter.');
+    newDoses.push({ drugKey: drugKey, opt: currentOpt, mgkg: mgkg });
+
+  } else if (response === 'worse') {
+    html += '<div class="banner banner-danger"><h4>Escalate now</h4>'
+          + '<p>Deterioration or a welfare concern is not a titration decision. Contact the behaviour '
+          + 'department or behaviour veterinarian in the <strong>Shelter Stress Cases</strong> Teams chat today, '
+          + 'and review whether the dog can be managed in the shelter at all.</p></div>';
+    planLines.push('Plan: dog deteriorating / welfare concern. Escalated to the behaviour department');
+    planLines.push('via the Shelter Stress Cases Teams chat for urgent review.');
+
+  } else if (!atCap) {
+    /* titrate the primary drug up by 25% */
+    var nextMgKg = Math.min(mgkg * 1.25, drug.capMgKg);
+    var nextOpt = pickNearest(drugKey, nextMgKg * p.weight, {});
+    html += '<div class="banner banner-info"><h4>Increase by 25%</h4>'
+          + '<p>Below the ' + drug.capMgKg + ' mg/kg ceiling, so titrate up and reassess again in 48 to 72 hours.</p></div>';
+    html += doseBlock(drugKey, nextOpt, p.weight, nextMgKg, 'New dose', 'next-dose');
+    planLines.push('Plan: increase ' + drug.name.toLowerCase() + ' to '
+      + formatNum(nextOpt.mg / p.weight, 2) + ' mg/kg PO BID - ' + formatMg(nextOpt.mg)
+      + ' mg (' + nextOpt.label + ') PO BID.');
+    planLines.push('Reassess in 48-72 hours, between 10am and 3pm.');
+    newDoses.push({ drugKey: drugKey, opt: nextOpt, mgkg: nextOpt.mg / p.weight });
+    if (drug.slowOnset && weeksOn === 0) {
+      html += '<div class="banner banner-warning"><h4>Give it time</h4>'
+            + '<p>Gabapentin takes several days to reach therapeutic effect. If the last increase was '
+            + 'only 48 hours ago, consider holding the current dose rather than titrating again.</p></div>';
+    }
+
+  } else if (!hasAddon) {
+    /* at ceiling, nothing added yet */
+    var gaba = pickNearest('gabapentin', DRUGS.gabapentin.startMgKg * p.weight, {});
+    var preg = pickNearest('pregabalin', DRUGS.pregabalin.startMgKg * p.weight, {});
+    html += '<div class="banner banner-warning"><h4>At the ' + esc(drug.name.toLowerCase())
+          + ' ceiling &mdash; add a second drug</h4>'
+          + '<p>Do not titrate ' + esc(drug.name.toLowerCase()) + ' past ' + drug.capMgKg
+          + ' mg/kg BID. Moderate to severe shelter stress at the ceiling calls for one second-line add-on.</p></div>';
+    html += doseBlock('gabapentin', gaba, p.weight, DRUGS.gabapentin.startMgKg,
+                      'Option A - add gabapentin', 'next-dose');
+    html += doseBlock('pregabalin', preg, p.weight, DRUGS.pregabalin.startMgKg,
+                      'Option B - add pregabalin', 'next-dose');
+    planLines.push('Plan: at the ' + drug.name.toLowerCase() + ' ceiling of ' + drug.capMgKg
+      + ' mg/kg BID. Continue current dose and add ONE second-line drug:');
+    planLines.push('  Gabapentin ' + formatMg(gaba.mg) + ' mg (' + gaba.label + ') PO BID, '
+      + formatNum(gaba.mg / p.weight, 2) + ' mg/kg; or');
+    planLines.push('  Pregabalin ' + formatMg(preg.mg) + ' mg (' + preg.label + ') PO BID, '
+      + formatNum(preg.mg / p.weight, 2) + ' mg/kg.');
+    planLines.push('Reassess in 48-72 hours, between 10am and 3pm.');
+    newDoses.push({ drugKey: drugKey, opt: currentOpt, mgkg: mgkg });
+    newDoses.push({ drugKey: 'gabapentin', opt: gaba, mgkg: DRUGS.gabapentin.startMgKg, alternative: true });
+    newDoses.push({ drugKey: 'pregabalin', opt: preg, mgkg: DRUGS.pregabalin.startMgKg, alternative: true });
+
+  } else if (!addonAtCap) {
+    /* primary at ceiling, titrate the add-on */
+    var aDrug = DRUGS[addonKey];
+    var aNextMgKg = Math.min(addonMgKg * 1.25, aDrug.capMgKg);
+    var aNextOpt = pickNearest(addonKey, aNextMgKg * p.weight, {});
+    var aCurOpt = pickNearest(addonKey, addonMgKg * p.weight, {});
+    html += doseBlock(addonKey, aCurOpt, p.weight, addonMgKg, 'Current add-on dose');
+    html += '<div class="banner banner-info"><h4>Titrate the add-on</h4>'
+          + '<p>' + esc(drug.name) + ' is at its ceiling. Increase ' + esc(aDrug.name.toLowerCase())
+          + ' by 25%, up to its ceiling of ' + aDrug.capMgKg + ' mg/kg BID.</p></div>';
+    html += doseBlock(addonKey, aNextOpt, p.weight, aNextMgKg, 'New add-on dose', 'next-dose');
+    planLines.push('Plan: ' + drug.name.toLowerCase() + ' remains at ' + formatNum(mgkg, 2)
+      + ' mg/kg PO BID (ceiling). Increase ' + aDrug.name.toLowerCase() + ' to '
+      + formatNum(aNextOpt.mg / p.weight, 2) + ' mg/kg PO BID - ' + formatMg(aNextOpt.mg)
+      + ' mg (' + aNextOpt.label + ') PO BID.');
+    planLines.push('Reassess in 48-72 hours, between 10am and 3pm.');
+    newDoses.push({ drugKey: drugKey, opt: currentOpt, mgkg: mgkg });
+    newDoses.push({ drugKey: addonKey, opt: aNextOpt, mgkg: aNextOpt.mg / p.weight });
+
+  } else {
+    /* both at ceiling */
+    html += '<div class="banner banner-danger"><h4>Both drugs at ceiling &mdash; refer</h4>'
+          + '<p>' + esc(drug.name) + ' and ' + esc(DRUGS[addonKey].name)
+          + ' are both at their ceilings and the dog is still stressed. Refer to the behaviour '
+          + 'department or behaviour veterinarian rather than titrating further. Flag in the '
+          + '<strong>Shelter Stress Cases</strong> Teams chat.</p></div>';
+    planLines.push('Plan: ' + drug.name.toLowerCase() + ' and ' + DRUGS[addonKey].name.toLowerCase()
+      + ' both at ceiling with ongoing shelter stress.');
+    planLines.push('Referred to the behaviour department / behaviour veterinarian via the');
+    planLines.push('Shelter Stress Cases Teams chat.');
+    newDoses.push({ drugKey: drugKey, opt: currentOpt, mgkg: mgkg });
+  }
+
+  /* four week trigger */
+  if (weeksOn >= 4) {
+    html += '<div class="banner banner-warning"><h4>Four weeks on medication</h4>'
+          + '<p>This dog has been on shelter stress medication for 4 weeks or more. Consider starting '
+          + 'long-term behaviour medication rather than continuing short-acting treatment.</p>'
+          + '<p><strong>Consult Dr Leonie Poulter, Behaviour Department Veterinarian, for case management.</strong></p></div>';
+    planLines.push('');
+    planLines.push('On medication 4 weeks or more - consider long-term behaviour medication.');
+    planLines.push('To consult Dr Leonie Poulter for case management.');
+  }
+
+  el('rc-result').innerHTML = html;
+
+  /* pen medication instructions for the new dose */
+  var lHtml = '';
+  newDoses.forEach(function (d) {
+    var u = d.opt.parts;
+    var perDay = u.map(function (x) { return fraction(x.count * 2) + ' × ' + x.unit.mg + ' mg'; }).join(' + ');
+    var perWeek = u.map(function (x) {
+      return Math.ceil(x.count * 2 * 7 - EPS) + ' × ' + x.unit.mg + ' mg '
+           + unitWord(2, x.unit.form);
+    }).join(' + ');
+    lHtml += '<div class="label-card">'
+      + '<span class="label-index">' + (d.alternative ? 'Option &mdash; ' : '') + 'Pen medication instruction</span>'
+      + '<div class="label-card-head"><span class="label-card-drug">' + esc(DRUGS[d.drugKey].name) + ' '
+      + formatMg(d.opt.mg) + ' mg twice daily</span>'
+      + '<span class="label-card-qty">' + formatNum(d.opt.mg / p.weight, 2) + ' mg/kg</span></div>'
+      + '<div class="label-sig"><p>Give <strong>' + d.opt.label + '</strong> by mouth twice daily.</p></div>'
+      + '<div class="label-foot">'
+      + 'Per day: ' + perDay + '&nbsp;&nbsp;&middot;&nbsp;&nbsp;Per week: ' + perWeek + '<br>'
+      + 'Dog: ' + (p.name || '____________') + '&nbsp;&nbsp;&nbsp;ID: ' + (p.id || '____________')
+      + '&nbsp;&nbsp;&nbsp;Date: ' + auDate(p.date) + '&nbsp;&nbsp;&nbsp;Vet: ' + (p.vet || '______') + '<br>'
+      + '<span class="caps">For animal treatment only</span> &middot; Record on the green Shelter Stress Medication Sheet'
+      + '</div></div>';
+  });
+  el('rc-labels').innerHTML = lHtml
+    ? '<div class="sub-title">Medication instruction for the pen</div>' + lHtml
+    : '';
+
+  /* note */
+  var lines = noteHeader(p, 'SHELTER STRESS - RECHECK');
+  lines.push('Reviewed FAS scores on the Shelter Stress Medication Sheet, daily observation');
+  lines.push('notes on pen, and discussed with the animal attendants.');
+  var fas = val('rc-fas');
+  if (fas) lines.push('Current FAS score: ' + fas);
+  lines.push('');
+  lines.push('Current medication: ' + doseSentence(drugKey, currentOpt, p.weight)
+    + (hasAddon ? '; plus ' + doseSentence(addonKey, pickNearest(addonKey, addonMgKg * p.weight, {}), p.weight) : '') + '.');
+  lines.push('Response: ' + ({
+    managed: 'well managed, signs resolving',
+    partial: 'partial response, some improvement but not enough',
+    ineffective: 'ineffective, no meaningful change',
+    worse: 'deteriorating / welfare concern'
+  })[response] + '.');
+  lines.push('');
+  planLines.forEach(function (l) { lines.push(l); });
+  el('rc-note').textContent = lines.join('\n');
+}
+
+/* ==================================================================
+   Mode 3 - wean and discharge
+   ================================================================== */
+function weanTable(drugKey, ladder) {
+  var drug = DRUGS[drugKey];
+  var html = '<table class="wean-table"><thead><tr>'
+           + '<th>Week</th><th>Dose</th><th>Give</th><th style="text-align:right">% of start</th>'
+           + '</tr></thead><tbody>';
+
+  ladder.weeks.forEach(function (w) {
+    var pct = Math.round((w.option.mg * w.perDay) / (ladder.startMg * 2) * 100);
+    var edited = overrides[drugKey + ':' + w.week] !== undefined;
+    html += '<tr' + (edited ? ' class="edited"' : '') + '>';
+    html += '<td class="wk">Week ' + w.week + '</td>';
+    html += '<td class="amt">' + formatMg(w.option.mg) + ' mg ' + w.freq + '</td>';
+    html += '<td><select data-drug="' + drugKey + '" data-week="' + w.week + '" class="week-override">';
+    OPTIONS[drugKey].forEach(function (o) {
+      if (o.mg > ladder.startMg + EPS) return;
+      var chosen = Math.abs(o.mg - w.option.mg) < EPS;
+      /* show the representation this week actually uses, which may keep the
+         previous week's tablet rather than the globally cheapest one */
+      html += '<option value="' + o.mg + '"' + (chosen ? ' selected' : '') + '>'
+            + (chosen ? w.option.label : o.label) + '</option>';
+    });
+    html += '</select></td>';
+    html += '<td class="pct">' + pct + '%</td></tr>';
+  });
+
+  html += '<tr class="stop-row"><td class="wk">Week ' + (ladder.weeks.length + 1)
+        + '</td><td colspan="3">STOP &mdash; ' + esc(drug.name.toLowerCase()) + ' finished</td></tr>';
+  return html + '</tbody></table>';
+}
+
+function labelCards(drugKey, ladder, p) {
+  var groups = buildLabels(drugKey, ladder);
+  var html = '';
+  groups.forEach(function (g, idx) {
+    html += '<div class="label-card">';
+    html += '<span class="label-index">Label ' + (idx + 1) + ' of ' + groups.length + '</span>';
+    html += '<div class="label-card-head"><span class="label-card-drug">' + esc(g.title) + '</span>'
+          + '<span class="label-card-qty">Qty ' + g.qty + '</span></div>';
+    html += '<div class="label-sig"><ol>';
+    g.lines.forEach(function (l, i) {
+      var tail = (i === g.lines.length - 1)
+        ? (idx === groups.length - 1 ? ', then STOP.' : ', then follow the next label.')
+        : ', THEN';
+      html += '<li>' + esc(l.text + tail) + '</li>';
+    });
+    html += '</ol></div>';
+    html += '<div class="label-foot">'
+          + 'Dog: ' + (p.name || '________________') + '&nbsp;&nbsp;&nbsp;ID: ' + (p.id || '____________')
+          + '&nbsp;&nbsp;&nbsp;Date: ' + auDate(p.date) + '<br>'
+          + 'Prescribing veterinarian: ' + (p.vet || '____________________') + '<br>'
+          + '<span class="caps">For animal treatment only</span> &middot; Keep out of reach of children '
+          + '&middot; Store below 25&deg;C'
+          + '</div></div>';
+  });
+  return html;
+}
+
+function recalcWean(rebuild) {
+  var p = patientInfo();
+  if (!validWeight(p.weight)) {
+    var msg = '<p class="muted">Enter a valid weight between 0.5 and 100 kg.</p>';
+    el('wean-result').innerHTML = msg;
+    el('label-result').innerHTML = '';
+    el('wean-note').textContent = '';
+    return;
+  }
+
+  var plans = [];
+
+  /* trazodone */
+  var trazOn = val('wn-traz-on') === 'yes';
+  ['wn-traz-mgkg-field', 'wn-traz-dose-field', 'wn-traz-days-field'].forEach(function (id) {
+    el(id).classList.toggle('dimmed', !trazOn);
+    var c = el(id).querySelector('input, select');
+    if (c) c.disabled = !trazOn;
+  });
+  if (trazOn) {
+    var tMgKg = parseFloat(el('wn-traz-mgkg').value);
+    if (!isFinite(tMgKg) || tMgKg <= 0) tMgKg = DRUGS.trazodone.startMgKg;
+    el('wn-traz-help').textContent = 'Target ' + formatMg(tMgKg * p.weight) + ' mg per dose.';
+    var tOpt;
+    if (rebuild === true || startOverride['wean:trazodone'] === undefined) {
+      tOpt = pickNearest('trazodone', tMgKg * p.weight, {});
+      startOverride['wean:trazodone'] = tOpt ? tOpt.mg : 0;
+      populateDoseSelect(el('wn-traz-dose'), 'trazodone', startOverride['wean:trazodone']);
+    } else {
+      tOpt = optionByMg('trazodone', startOverride['wean:trazodone']);
+      if (!tOpt) { tOpt = pickNearest('trazodone', tMgKg * p.weight, {}); startOverride['wean:trazodone'] = tOpt.mg; }
+    }
+    plans.push({ drugKey: 'trazodone', startOption: tOpt, wean: val('wn-traz-days') === 'long' });
+  }
+
+  /* add-on */
+  var addonKey = val('wn-addon');
+  var hasAddon = addonKey !== 'none';
+  ['wn-addon-mgkg-field', 'wn-addon-dose-field', 'wn-addon-days-field'].forEach(function (id) {
+    el(id).classList.toggle('dimmed', !hasAddon);
+    var c = el(id).querySelector('input, select');
+    if (c) c.disabled = !hasAddon;
+  });
+  if (hasAddon) {
+    var aMgKg = parseFloat(el('wn-addon-mgkg').value);
+    if (!isFinite(aMgKg) || aMgKg <= 0) aMgKg = DRUGS[addonKey].startMgKg;
+    el('wn-addon-help').textContent = 'Target ' + formatMg(aMgKg * p.weight) + ' mg per dose.';
+    var aOpt;
+    if (rebuild === true || startOverride['wean:' + addonKey] === undefined) {
+      aOpt = pickNearest(addonKey, aMgKg * p.weight, {});
+      startOverride['wean:' + addonKey] = aOpt ? aOpt.mg : 0;
+      populateDoseSelect(el('wn-addon-dose'), addonKey, startOverride['wean:' + addonKey]);
+    } else {
+      aOpt = optionByMg(addonKey, startOverride['wean:' + addonKey]);
+      if (!aOpt) { aOpt = pickNearest(addonKey, aMgKg * p.weight, {}); startOverride['wean:' + addonKey] = aOpt.mg; }
+    }
+    plans.push({ drugKey: addonKey, startOption: aOpt, wean: val('wn-addon-days') === 'long' });
+  }
+
+  if (!plans.length) {
+    el('wean-result').innerHTML = '<div class="banner banner-info"><h4>No medication selected</h4>'
+      + '<p>Select trazodone, an add-on, or both.</p></div>';
+    el('label-result').innerHTML = '';
+    el('wean-note').textContent = '';
+    return;
+  }
+
+  plans.forEach(function (plan) {
+    if (!plan.wean || !plan.startOption) { plan.ladder = null; return; }
+    var ladder = buildLadder(plan.drugKey, plan.startOption);
+    ladder.startMg = plan.startOption.mg;
+    ladder.weeks.forEach(function (w) {
+      var ov = overrides[plan.drugKey + ':' + w.week];
+      if (ov !== undefined) {
+        var o = optionByMg(plan.drugKey, ov);
+        if (o) w.option = o;
+      }
+    });
+    plan.ladder = ladder;
+  });
+
+  /* schedule */
+  var wHtml = '';
+  plans.forEach(function (plan) {
+    var drug = DRUGS[plan.drugKey];
+    wHtml += '<div class="wean-drug">';
+    wHtml += '<div class="wean-drug-head">' + esc(drug.name) + '</div>';
+    if (!plan.wean) {
+      wHtml += '<div class="wean-drug-sub">On medication 28 days or less.</div>'
+             + '<div class="banner banner-success"><h4>No weaning required</h4>'
+             + '<p>Stop ' + esc(drug.name.toLowerCase()) + ' at exit. Nothing to dispense for this drug.</p></div></div>';
+      return;
+    }
+    wHtml += '<div class="wean-drug-sub">More than 28 days &mdash; shelter dose '
+           + formatMg(plan.startOption.mg) + ' mg twice daily (' + plan.startOption.label + ').</div>';
+    wHtml += weanTable(plan.drugKey, plan.ladder);
+    if (plan.ladder.note) {
+      wHtml += '<div class="banner banner-info"><h4>Note</h4><p>' + esc(plan.ladder.note) + '</p></div>';
+    }
+    wHtml += '</div>';
+  });
+
+  var weaning = plans.filter(function (x) { return x.wean; });
+  if (weaning.length === 2) {
+    wHtml += '<div class="banner banner-info"><h4>Both drugs weaning</h4>'
+           + '<p>Both drugs have been given for more than 28 days, so they step down in parallel and finish together.</p></div>';
+  } else if (weaning.length === 1 && plans.length === 2) {
+    var stopped = plans.filter(function (x) { return !x.wean; })[0];
+    wHtml += '<div class="banner banner-info"><h4>One drug weaning</h4>'
+           + '<p>' + esc(DRUGS[weaning[0].drugKey].name) + ' weans over the schedule above. '
+           + esc(DRUGS[stopped.drugKey].name)
+           + ' was given for 28 days or less, so it stops at exit with no wean.</p></div>';
+  } else if (!weaning.length) {
+    wHtml += '<div class="banner banner-success"><h4>Nothing to wean</h4>'
+           + '<p>All medication has been given for 28 days or less. Stop at exit.</p></div>';
+  }
+  el('wean-result').innerHTML = wHtml;
+
+  /* labels */
+  var lHtml = '';
+  weaning.forEach(function (plan) {
+    lHtml += '<div class="sub-title">' + esc(DRUGS[plan.drugKey].name) + '</div>';
+    lHtml += labelCards(plan.drugKey, plan.ladder, p);
+  });
+  el('label-result').innerHTML = lHtml || '<div class="banner banner-success">'
+    + '<h4>No medication to dispense</h4><p>Nothing has been given for more than 28 days, '
+    + 'so no weaning supply is needed.</p></div>';
+
+  /* note */
+  var lines = noteHeader(p, 'SHELTER STRESS - ADOPTION MEDICATION PACK');
+  lines.push('Adoption medication pack weaning dose dispensed. Please follow the weaning plan');
+  lines.push('below post adoption.');
+  lines.push('');
+  plans.forEach(function (plan) {
+    var drug = DRUGS[plan.drugKey];
+    lines.push(drug.name.toUpperCase() + ' - shelter dose ' + formatMg(plan.startOption.mg)
+      + ' mg PO BID (' + plan.startOption.label + ')');
+    if (!plan.wean) {
+      lines.push('  On medication 28 days or less - no weaning required. Stop at exit.');
+      lines.push('');
+      return;
+    }
+    plan.ladder.weeks.forEach(function (w) {
+      lines.push('  Week ' + w.week + ': give ' + w.option.label + ' PO '
+        + (w.perDay === 2 ? 'BID' : 'SID') + ' for 7 days');
+    });
+    lines.push('  Then stop.');
+    buildLabels(plan.drugKey, plan.ladder).forEach(function (g) {
+      lines.push('  Dispensed: ' + g.qty + ' × ' + drug.name + ' ' + g.unit.mg + ' mg '
+        + g.unit.form + 's');
+    });
+    if (plan.ladder.note) lines.push('  Note: ' + plan.ladder.note);
+    lines.push('');
+  });
+  lines.push('Adopter / carer advised to monitor for any increase in anxiety, change in');
+  lines.push('behaviour or change in physical health during the wean, and to stop reducing');
+  lines.push('and make contact if the dog deteriorates. Post-Adoption Behaviour Support');
+  lines.push('contact details given; urgent care via the LDH Veterinary Hospital.');
+  el('wean-note').textContent = lines.join('\n');
+
+  Array.prototype.forEach.call(document.querySelectorAll('.week-override'), function (sel) {
+    sel.addEventListener('change', function () {
+      overrides[sel.getAttribute('data-drug') + ':' + sel.getAttribute('data-week')] = parseFloat(sel.value);
+      recalcWean(false);
+    });
+  });
+}
+
+/* ==================================================================
+   Wiring
+   ================================================================== */
+function recalcAll(rebuild) {
+  if (mode === 'start') recalcStart(rebuild);
+  else if (mode === 'recheck') recalcRecheck();
+  else recalcWean(rebuild);
+}
+
+function resetDerived() {
+  overrides = {};
+  startOverride = {};
+}
+
+function setMode(m) {
+  mode = m;
+  ['start', 'recheck', 'wean'].forEach(function (x) {
+    el('panel-' + x).classList.toggle('hidden', x !== m);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
+    b.classList.toggle('active', b.getAttribute('data-mode') === m);
+  });
+  recalcAll(true);
+}
+
+Array.prototype.forEach.call(document.querySelectorAll('.mode-btn'), function (b) {
+  b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); });
+});
+
+/* shared patient fields */
+['weight'].forEach(function (id) {
+  el(id).addEventListener('input', function () { resetDerived(); recalcAll(true); });
+});
+['dogname', 'dogid', 'vetinit', 'notedate', 'location'].forEach(function (id) {
+  el(id).addEventListener('input', function () { recalcAll(false); });
+});
+el('notedate').addEventListener('change', function () { recalcAll(false); });
+
+/* start mode */
+el('start-drug').addEventListener('change', function () {
+  el('start-mgkg').value = DRUGS[val('start-drug')].startMgKg;
+  resetDerived();
+  recalcStart(true);
+});
+el('start-mgkg').addEventListener('input', function () { resetDerived(); recalcStart(true); });
+el('start-fas').addEventListener('input', function () { recalcStart(false); });
+el('start-dose').addEventListener('change', function () {
+  startOverride['start:' + val('start-drug')] = parseFloat(this.value);
+  recalcStart(false);
+});
+
+/* recheck mode */
+['rc-drug', 'rc-addon', 'rc-response', 'rc-weeks'].forEach(function (id) {
+  el(id).addEventListener('change', function () {
+    if (id === 'rc-drug') el('rc-mgkg').value = DRUGS[val('rc-drug')].startMgKg;
+    if (id === 'rc-addon' && val('rc-addon') !== 'none') {
+      el('rc-addon-mgkg').value = DRUGS[val('rc-addon')].startMgKg;
+    }
+    recalcRecheck();
+  });
+});
+['rc-mgkg', 'rc-addon-mgkg', 'rc-fas'].forEach(function (id) {
+  el(id).addEventListener('input', recalcRecheck);
+});
+
+/* wean mode */
+['wn-traz-on', 'wn-traz-days', 'wn-addon', 'wn-addon-days'].forEach(function (id) {
+  el(id).addEventListener('change', function () {
+    if (id === 'wn-addon') {
+      var a = val('wn-addon');
+      if (a !== 'none') el('wn-addon-mgkg').value = DRUGS[a].startMgKg;
+      resetDerived();
+      recalcWean(true);
+      return;
+    }
+    recalcWean(false);
+  });
+});
+['wn-traz-mgkg', 'wn-addon-mgkg'].forEach(function (id) {
+  el(id).addEventListener('input', function () { resetDerived(); recalcWean(true); });
+});
+el('wn-traz-dose').addEventListener('change', function () {
+  startOverride['wean:trazodone'] = parseFloat(this.value);
+  Object.keys(overrides).forEach(function (k) { if (k.indexOf('trazodone:') === 0) delete overrides[k]; });
+  recalcWean(false);
+});
+el('wn-addon-dose').addEventListener('change', function () {
+  var a = val('wn-addon');
+  if (a === 'none') return;
+  startOverride['wean:' + a] = parseFloat(this.value);
+  Object.keys(overrides).forEach(function (k) { if (k.indexOf(a + ':') === 0) delete overrides[k]; });
+  recalcWean(false);
+});
+
+/* copy buttons */
+Array.prototype.forEach.call(document.querySelectorAll('[data-copy]'), function (btn) {
+  btn.addEventListener('click', function () {
+    var text = el(btn.getAttribute('data-copy')).textContent;
+    var original = btn.textContent;
+    function done() {
+      btn.textContent = 'Copied';
+      setTimeout(function () { btn.textContent = original; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () {});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  });
+});
+
+el('print-btn').addEventListener('click', function () { window.print(); });
+
+/* init */
+(function () {
+  var d = new Date();
+  el('notedate').value = d.getFullYear() + '-'
+    + String(d.getMonth() + 1).padStart(2, '0') + '-'
+    + String(d.getDate()).padStart(2, '0');
+  renderSigns();
+  setMode('start');
+})();
+</script>
+
+</body>
+</html>
