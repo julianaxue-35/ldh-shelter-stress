@@ -32,6 +32,14 @@ Above either ceiling, refer to the behaviour department. Gabapentin, mirtazapine
 not part of this pathway. A dog on trazodone at 4 weeks should be considered for long-term
 behaviour medication — consult Dr Leonie Poulter for case management.
 
+**Serotonergic combinations.** If the dog is already on another serotonergic medication, the
+trazodone ceiling drops from 10 to **7 mg/kg BID**. A shared yes/no field drives every ceiling
+check in the tool, and the titration never rounds a tablet above the ceiling in force. The drug
+list, serotonin syndrome signs and treatment are carried in their own section, lifted from
+`~/sedation-protocol/dog-sedation.html` so the two documents agree. Note that agitation,
+vocalisation, panting, mydriasis and hypersalivation appear on both the arousal chart and the
+serotonin syndrome list — the tool says so, since the wrong reading leads to a dose increase.
+
 ### Stocked strengths
 
 | Drug | Strengths | Splitting | Floor |
@@ -67,8 +75,9 @@ Labels, quantities and the waiver text all recalculate.
 
 Ten signs, five arousal and five fear, chosen as the ones a shelter vet most often sees at the pen.
 Arousal signs point to clonidine, fear signs to pregabalin. Juliana's full body-language reference
-charts (15-panel arousal, 17-panel fear, from `~/behaviour-resources/`) are embedded as base64
-under a collapsible for anything not on the tick list.
+charts (15-panel arousal, 17-panel fear, from `~/behaviour-resources/`) appear both under the tick
+boxes and in *Recognising shelter stress*. The base64 is held once in a `CHARTS` object and
+rendered into every `[data-charts]` container, so two placements cost one copy of each image.
 
 ## Worked examples (regression cases)
 
