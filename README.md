@@ -1,7 +1,7 @@
 # LDH Shelter Stress Management Tool — Dogs
 
-A single self-contained HTML tool supporting the LDH SOP *Shelter Stress Management – Dogs* v1.0
-across the North Melbourne and Cranbourne sites.
+A single self-contained HTML tool implementing the LDH SOP *Shelter Stress Management – Dogs*
+**v1.1** across the North Melbourne and Cranbourne sites.
 
 Open `shelter-stress.html` in any browser. No server, no install, nothing external — it can be
 emailed or dropped on a shared drive as-is.
@@ -19,69 +19,81 @@ so it is deliberately not published to GitHub Pages and has no public remote.
 | **2. Recheck** | 48–72 h or weekly review | Maintain / increase 25% / add second drug / refer, with the new dose and pen medication instruction |
 | **3. Wean and discharge** | Adoption, foster, rescue | Weaning ladder, dispensing labels with quantities, waiver text for the Sheltermate indemnity |
 
-## Clinical rules
+## Clinical rules (SOP v1.1)
 
-Trazodone 6 mg/kg BID first line for **every** dog regardless of size, +25% steps, ceiling
-10 mg/kg BID. Then one second-line add-on: gabapentin 20 mg/kg BID up to 40, or pregabalin
-3–5 mg/kg BID. Above either ceiling, refer to the behaviour department.
+Three medications only. Trazodone 5 mg/kg BID first line for **every** dog regardless of size,
+titrated in 25% increments to a ceiling of 10 mg/kg BID. At the ceiling, add ONE second-line drug
+chosen on the presenting signs:
 
-A dog on trazodone at 4 weeks should be considered for long-term behaviour medication —
-consult Dr Leonie Poulter for case management.
+- **Clonidine** 0.02 mg/kg BID — aroused or reactive dogs, ceiling 0.05 mg/kg BID
+- **Pregabalin** 2–10 mg/kg BID — fearful or shut-down dogs, ceiling 10 mg/kg BID
+
+Above either ceiling, refer to the behaviour department. Gabapentin, mirtazapine and Zylkene are
+not part of this pathway. A dog on trazodone at 4 weeks should be considered for long-term
+behaviour medication — consult Dr Leonie Poulter for case management.
 
 ### Stocked strengths
 
-| Drug | Strengths | Splitting |
-|---|---|---|
-| Trazodone | 100 mg tablet | ¼, ½, ¾ |
-| Gabapentin | 100, 300 mg capsules | none — do not open |
-| Gabapentin | 600, 800 mg tablets | ¼, ½, ¾ |
-| Pregabalin | 25, 75 mg capsules | none |
+| Drug | Strengths | Splitting | Floor |
+|---|---|---|---|
+| Trazodone | 100 mg tablet | ¼, ½, ¾ | 25 mg |
+| Clonidine | 100 mcg, 150 mcg tablets; 1200 mcg compounded | ¼, ½, ¾ | 25 mcg |
+| Pregabalin | 25, 75 mg capsules | none — do not open | 25 mg |
+
+Clonidine strengths come from the Veterinary Decision Support sedation protocol
+(`~/sedation-protocol/dog-sedation.html`) and **still need confirming against what LDH stocks**.
 
 ### Weaning
 
-28 days or less → no weaning, stop at exit. More than 28 days → wean.
+28 days or less → no weaning, stop at exit. More than 28 days → reduce by 25% of the shelter dose
+each week: ¾ in week 1, ½ in week 2, ¼ in week 3, stop at the end of week 4.
 
-Trazodone and gabapentin step down 25% of the shelter dose per week, snapped to amounts the
-stocked strengths can actually make, capped at 4 dosing weeks. Where a capsule size forces the
-25% rung to round up, the ladder takes one extra week to get down to a quarter of the shelter
-dose. A dog already on the smallest unit cannot have its dose reduced, so the frequency halves
-instead: BID ×2 weeks, SID ×2 weeks, stop. Pregabalin always uses that frequency ladder because
-its capsules cannot be split.
+Each step snaps to an amount the stocked strengths can actually make. Where a capsule size forces
+a step to round up, the ladder takes one extra week to reach a quarter of the shelter dose, capped
+at 4 dosing weeks. A dog already on the smallest unit cannot have its dose reduced, so the
+frequency halves instead: BID ×2 weeks, SID ×2 weeks, stop — this is the usual path for pregabalin
+in small dogs, since its capsules cannot be opened.
 
-**No more than two units of one strength per dose.** Six 100 mg capsules twice daily is not
-something an owner will manage, so any representation using two or fewer units always wins where
-one exists — 600 mg is one 600 mg tablet, never six 100 mg capsules. Where no combination of
-stocked strengths reaches the dose in two units (a 60 kg dog on trazodone, which only comes as
-100 mg), the tool says so rather than hiding it.
+**No more than two units of one strength per dose.** Six capsules twice daily is not something an
+owner will manage, so any representation using two or fewer units always wins where one exists.
+Where no combination reaches the dose in two units — a 60 kg dog on trazodone, which only comes as
+100 mg — the tool says so rather than hiding it.
 
-Every week is overridable from a dropdown that offers **every** way of giving that amount — for
-300 mg you get both `½ × 600 mg tablet` and `1 × 300 mg capsule`, and for 600 mg you get
-`1 × 600 mg tablet`, `2 × 300 mg capsules` and `¾ × 800 mg tablet`. Both stepping down to a whole
-lower strength and cutting the tablet you are already on are acceptable, so the vet picks.
+Every week is overridable from a dropdown that offers **every** way of giving that amount, so both
+stepping down to a whole lower strength and cutting the tablet already in hand are available.
 Labels, quantities and the waiver text all recalculate.
 
-Labels are grouped by **drug + strength** — one label per strength, listing every week that uses
-it, so a strength spanning two weeks stays on a single bag.
+### Sign tick boxes
+
+Ten signs, five arousal and five fear, chosen as the ones a shelter vet most often sees at the pen.
+Arousal signs point to clonidine, fear signs to pregabalin. Juliana's full body-language reference
+charts (15-panel arousal, 17-panel fear, from `~/behaviour-resources/`) are embedded as base64
+under a collapsible for anything not on the tick list.
 
 ## Worked examples (regression cases)
 
 ```
-Gabapentin 600 mg BID            Gabapentin 400 mg BID
-  Wk1  ¾ × 600 = 450   75%         Wk1  1 × 300 = 300   75%
-  Wk2  ½ × 600 = 300   50%         Wk2  2 × 100 = 200   50%
-  Wk3  2 × 100 = 200   33%         Wk3  1 × 100 = 100   25%
-  Wk4  1 × 100 = 100   17%         then STOP
+Trazodone 150 mg BID (30 kg @ 5)   Clonidine 400 mcg BID (20 kg @ 0.02)
+  Wk1  1   × 100 mg = 100  67%       Wk1  2 × 150 mcg = 300  75%
+  Wk2  ¾   × 100 mg =  75  50%       Wk2  2 × 100 mcg = 200  50%
+  Wk3  ½   × 100 mg =  50  33%       Wk3  1 × 100 mcg = 100  25%
+  Wk4  ¼   × 100 mg =  25  17%       then STOP
   then STOP
-  Labels: 18 × 600 mg, 42 × 100 mg  Labels: 14 × 300 mg, 42 × 100 mg
+
+Pregabalin 150 mg BID (40 kg @ 4)  Pregabalin 25 mg BID (5 kg, at floor)
+  Wk1  25+75 mg = 100  67%           Wk1-2  25 mg BID
+  Wk2  1 × 75   =  75  50%           Wk3-4  25 mg SID
+  Wk3  2 × 25   =  50  33%           then STOP
+  Wk4  1 × 25   =  25  17%
+  then STOP
 ```
 
-## Changes from SOP v1.0
+## Relationship to the Word SOP
 
-The tool deliberately departs from SOP v1.0 in seven places — no small-dog branch, Zylkene and
-mirtazapine removed, trazodone ceiling raised to 10 mg/kg, weaning defined by duration and shape,
-pregabalin frequency ladder, and the 4-week long-term medication trigger. All seven are listed in
-the *Changes from SOP v1.0* table at the bottom of the tool, for discussion with the behaviour
-department before the SOP is reissued.
+`~/Downloads/Shelter Stress Protocol v1.1.docx` carries the same changes, written into the
+original SOP with its sentence shapes preserved and a v1.1 row added to the version-control table.
+The original v1.0 file is untouched. The tool's *What changed in SOP v1.1* table lists the eight
+differences from v1.0 for staff who learned the old protocol.
 
 ## Testing
 
