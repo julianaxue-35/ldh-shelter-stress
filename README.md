@@ -1,4 +1,4 @@
-# LDH Shelter Stress Management Tool — Dogs
+# LDH Shelter Stress Protocol
 
 A single self-contained HTML tool implementing the LDH SOP *Shelter Stress Management – Dogs*
 **v1.1** across the North Melbourne and Cranbourne sites.
