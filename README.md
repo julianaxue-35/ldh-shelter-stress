@@ -6,10 +6,17 @@ A single self-contained HTML tool implementing the LDH SOP *Shelter Stress Manag
 Open `shelter-stress.html` in any browser. No server, no install, nothing external — it can be
 emailed or dropped on a shared drive as-is.
 
+**Location:** `Dropbox/work docs/job related info/LDH docs/ldh-shelter-stress-protocol/` — moved
+here from `~/ldh-shelter-stress` on 13 Aug 2026 so it lives alongside the Word SOP. It is still a
+git repo (`.git` moved with it) backed up to a **private** GitHub remote
+(`julianaxue-35/ldh-shelter-stress`). Dropbox continuously syncs files while they're being
+written, which is known to corrupt `.git` internals on an active repo — if commits here start
+misbehaving, that's the likely cause; the GitHub remote is the safety net.
+
 ## Private
 
 This repo is **internal**. It names LDH sites, Teams channel names, Sheltermate and named staff,
-so it is deliberately not published to GitHub Pages and has no public remote.
+so it is a **private** GitHub repo with no Pages site and no public URL.
 
 ## The three modes
 
@@ -99,10 +106,15 @@ Pregabalin 150 mg BID (40 kg @ 4)  Pregabalin 25 mg BID (5 kg, at floor)
 
 ## Relationship to the Word SOP
 
-`~/Downloads/Shelter Stress Protocol v1.1.docx` carries the same changes, written into the
-original SOP with its sentence shapes preserved and a v1.1 row added to the version-control table.
-The original v1.0 file is untouched. The tool's *What changed in SOP v1.1* table lists the eight
-differences from v1.0 for staff who learned the old protocol.
+The parent folder (`Dropbox/.../LDH docs/`) holds `Shelter Stress Protocol v1.1.docx`, which
+carries the same changes, written into the original SOP with its sentence shapes preserved and a
+v1.1 row added to the version-control table. `Shelter Stress Protocol.docx` (v1.0) sits alongside
+it, untouched. The tool's *What changed in SOP v1.1* table lists the differences from v1.0 for
+staff who learned the old protocol.
+
+The SOP's section 5 link points to this folder's `shelter-stress.html` by local file path — it
+only resolves on this machine. If the SOP is shared more widely, that link and the file both need
+to move somewhere every reader can reach.
 
 ## Testing
 
