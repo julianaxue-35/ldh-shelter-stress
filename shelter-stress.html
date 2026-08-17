@@ -228,6 +228,10 @@ body {
 }
 .sign-list input { width: 17px; height: 17px; min-height: 0; margin: 2px 0 0; flex: 0 0 auto; }
 
+.choice-group { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 10px 0; }
+.choice-radio { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+.choice-radio input { width: 16px; height: 16px; flex: 0 0 auto; }
+
 /* Body language reference charts */
 .chart-wrap { margin-top: 1rem; }
 .chart-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
@@ -2229,53 +2233,74 @@ function recalcRecheck() {
 
   } else if (!atCap) {
     /* ineffective, below ceiling - keep increasing the current drug, or
-       trial the branch-paired second-line drug now instead of waiting */
+       trial the branch-paired second-line drug now instead of waiting.
+       Vet ticks which one they're actually doing; only that one goes in
+       the note and gets a pen medication instruction. */
     var nextMgKg = Math.min(mgkg * 1.25, capFor(drugKey));
     var nextOpt = pickNearest(drugKey, nextMgKg * p.weight,
                               { maxMg: capFor(drugKey) * p.weight + EPS, weight: p.weight });
-    html += '<div class="banner banner-warning"><h4>Ineffective &mdash; two options</h4>'
-          + '<p>Either keep increasing ' + esc(drug.name.toLowerCase()) + ' by 25%, or trial the '
-          + 'paired second-line drug now rather than waiting for the ceiling.</p></div>';
-    html += doseBlock(drugKey, nextOpt, p.weight, nextMgKg, 'Option A &mdash; keep increasing', 'next-dose');
-    planLines.push('Plan (option A): keep increasing ' + drug.name.toLowerCase() + ' to '
-      + formatNum(nextOpt.mg / p.weight, 3) + ' mg/kg PO BID - ' + amt(drugKey, nextOpt.mg)
-      + ' (' + nextOpt.label + ') PO BID.');
-    newDoses.push({ drugKey: drugKey, opt: nextOpt, mgkg: nextOpt.mg / p.weight, alternative: true });
-
+    var ineffChoices = [{
+      letter: 'A',
+      label: 'keep increasing ' + drug.name.toLowerCase(),
+      render: function () { return doseBlock(drugKey, nextOpt, p.weight, nextMgKg, 'Option A &mdash; keep increasing', 'next-dose'); },
+      planLine: 'Plan: keep increasing ' + drug.name.toLowerCase() + ' to '
+        + formatNum(nextOpt.mg / p.weight, 3) + ' mg/kg PO BID - ' + amt(drugKey, nextOpt.mg)
+        + ' (' + nextOpt.label + ') PO BID.',
+      newDose: { drugKey: drugKey, opt: nextOpt, mgkg: nextOpt.mg / p.weight }
+    }];
     if (!hasAddon) {
       secondLineFor(drugKey).forEach(function (candKey, idx) {
         var letter = idx === 0 ? 'B' : 'C';
         var cOpt = pickNearest(candKey, DRUGS[candKey].startMgKg * p.weight, { weight: p.weight });
-        html += doseBlock(candKey, cOpt, p.weight, DRUGS[candKey].startMgKg,
-                          'Option ' + letter + ' &mdash; trial ' + DRUGS[candKey].name.toLowerCase(), 'next-dose');
-        planLines.push('Plan (option ' + letter + '): trial ' + DRUGS[candKey].name.toLowerCase() + ' '
-          + amt(candKey, cOpt.mg) + ' (' + cOpt.label + ') PO BID, '
-          + formatNum(cOpt.mg / p.weight, 3) + ' mg/kg.');
-        newDoses.push({ drugKey: candKey, opt: cOpt, mgkg: DRUGS[candKey].startMgKg, alternative: true });
+        ineffChoices.push({
+          letter: letter,
+          label: 'trial ' + DRUGS[candKey].name.toLowerCase(),
+          render: function () { return doseBlock(candKey, cOpt, p.weight, DRUGS[candKey].startMgKg,
+                                'Option ' + letter + ' &mdash; trial ' + DRUGS[candKey].name.toLowerCase(), 'next-dose'); },
+          planLine: 'Plan: trial ' + DRUGS[candKey].name.toLowerCase() + ' '
+            + amt(candKey, cOpt.mg) + ' (' + cOpt.label + ') PO BID, '
+            + formatNum(cOpt.mg / p.weight, 3) + ' mg/kg.',
+          newDose: { drugKey: candKey, opt: cOpt, mgkg: DRUGS[candKey].startMgKg }
+        });
       });
     }
+    html += '<div class="banner banner-warning"><h4>Ineffective</h4>'
+          + '<p>Below the ' + capFor(drugKey) + ' mg/kg ceiling. Tick which option you are taking.</p></div>';
+    var ineffPicked = choiceGroup(ineffChoices);
+    html += ineffPicked.html;
+    planLines.push(ineffPicked.chosen.planLine);
+    newDoses.push(ineffPicked.chosen.newDose);
     planLines.push('Reassess in 48-72 hours, between 10am and 3pm.');
 
   } else if (!hasAddon) {
-    /* at ceiling, nothing added yet - add the branch-paired second-line drug(s) */
+    /* at ceiling, nothing added yet - add the branch-paired second-line drug,
+       or tick which one when there are two candidates (arousal branch) */
+    var capChoices = secondLineFor(drugKey).map(function (candKey, idx) {
+      var letter = String.fromCharCode(65 + idx);
+      var cOpt = pickNearest(candKey, DRUGS[candKey].startMgKg * p.weight, { weight: p.weight });
+      var title = idx === 0 ? 'Option ' + letter + ' &mdash; add ' + DRUGS[candKey].name.toLowerCase()
+                             : 'Option ' + letter + ' &mdash; or trial ' + DRUGS[candKey].name.toLowerCase() + ' instead';
+      return {
+        letter: letter,
+        label: (idx === 0 ? 'add ' : 'trial ') + DRUGS[candKey].name.toLowerCase(),
+        render: function () { return doseBlock(candKey, cOpt, p.weight, DRUGS[candKey].startMgKg, title, 'next-dose'); },
+        planLine: 'Plan: at the ' + drug.name.toLowerCase() + ' ceiling of ' + capFor(drugKey)
+          + ' mg/kg BID' + (drugKey === 'trazodone' && onSerotonergic() ? ' (serotonergic combination)' : '')
+          + '. Continue current dose and add ' + DRUGS[candKey].name.toLowerCase() + ' '
+          + amt(candKey, cOpt.mg) + ' (' + cOpt.label + ') PO BID, ' + formatNum(cOpt.mg / p.weight, 3) + ' mg/kg.',
+        newDose: { drugKey: candKey, opt: cOpt, mgkg: DRUGS[candKey].startMgKg }
+      };
+    });
     html += '<div class="banner banner-warning"><h4>At the ' + esc(drug.name.toLowerCase())
           + ' ceiling &mdash; add a second drug</h4>'
-          + '<p>Do not titrate ' + esc(drug.name.toLowerCase()) + ' past ' + capFor(drugKey)
-          + ' mg/kg BID. Continue the current dose and add the paired second-line drug.</p></div>';
-    planLines.push('Plan: at the ' + drug.name.toLowerCase() + ' ceiling of ' + capFor(drugKey)
-      + ' mg/kg BID' + (drugKey === 'trazodone' && onSerotonergic()
-        ? ' (serotonergic combination)' : '')
-      + '. Continue current dose and add:');
+          + '<p>Do not titrate ' + esc(drug.name.toLowerCase()) + ' past ' + capFor(drugKey) + ' mg/kg BID.'
+          + (capChoices.length > 1 ? ' Tick which second-line drug you are adding.' : ' Continue the current dose and add the paired second-line drug.')
+          + '</p></div>';
+    var capPicked = choiceGroup(capChoices);
+    html += capPicked.html;
     newDoses.push({ drugKey: drugKey, opt: currentOpt, mgkg: mgkg });
-    secondLineFor(drugKey).forEach(function (candKey, idx) {
-      var cOpt = pickNearest(candKey, DRUGS[candKey].startMgKg * p.weight, { weight: p.weight });
-      var title = idx === 0 ? 'Add ' + DRUGS[candKey].name.toLowerCase()
-                             : 'Option &mdash; or trial ' + DRUGS[candKey].name.toLowerCase() + ' instead';
-      html += doseBlock(candKey, cOpt, p.weight, DRUGS[candKey].startMgKg, title, 'next-dose');
-      planLines.push('  ' + (idx === 0 ? '' : 'or, ') + DRUGS[candKey].name.toLowerCase() + ' '
-        + amt(candKey, cOpt.mg) + ' (' + cOpt.label + ') PO BID, ' + formatNum(cOpt.mg / p.weight, 3) + ' mg/kg.');
-      newDoses.push({ drugKey: candKey, opt: cOpt, mgkg: DRUGS[candKey].startMgKg, alternative: idx > 0 });
-    });
+    planLines.push(capPicked.chosen.planLine);
+    newDoses.push(capPicked.chosen.newDose);
     planLines.push('Reassess in 48-72 hours, between 10am and 3pm.');
 
   } else if (!addonAtCap) {
@@ -2353,13 +2378,12 @@ function recalcRecheck() {
 
   /* note - Response, then plan */
   var lines = noteHeader(p, 'SHELTER STRESS - RECHECK');
-  lines.push('Talked to an animal attendant for context - whether the stress is excessive and');
-  lines.push('constant, or only situational (e.g. feeding, cleaning). Stood at the FOP 30-60');
-  lines.push('seconds charting behaviour signs.');
-  lines.push('');
   var rcSigns = chosenRcSigns();
   lines.push('Reviewed animal in pen, patient appeared to have ' + ({
-    managed: 'improved', partial: 'improved', ineffective: 'no change', worse: 'deteriorated'
+    managed: 'improved (well managed, signs resolving)',
+    partial: 'improved (partial response, not enough)',
+    ineffective: 'no change (ineffective)',
+    worse: 'deteriorated (welfare concern)'
   })[response] + ' with the current medication.');
   var rcSignLine = rcSignSentence(rcSigns);
   if (rcSignLine) lines.push(rcSignLine);
@@ -2667,11 +2691,20 @@ el('start-fas').addEventListener('input', function () { recalcStart(false); });
       el('rc-addon-mgkg').value = DRUGS[val('rc-addon')].startMgKg;
       tuneMgKgField('rc-addon-mgkg', val('rc-addon'));
     }
+    if (id === 'rc-drug' || id === 'rc-response') rcChoice = 'A';
     recalcRecheck();
   });
 });
 ['rc-mgkg', 'rc-addon-mgkg', 'rc-fas'].forEach(function (id) {
   el(id).addEventListener('input', recalcRecheck);
+});
+/* choice-group radios are re-rendered on every recalcRecheck(), so this is
+   delegated on the document rather than bound to elements that get replaced */
+document.addEventListener('change', function (e) {
+  if (e.target && e.target.name === 'rc-choice') {
+    rcChoice = e.target.value;
+    recalcRecheck();
+  }
 });
 
 /* wean mode */
