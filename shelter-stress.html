@@ -910,23 +910,43 @@ body.ldh-locked > .container { display: none; }
         </select>
       </div>
 
-      <div class="form-group-label">Second-line add-on</div>
+      <div class="form-group-label">Clonidine</div>
       <div class="field">
-        <label for="wn-addon">Add-on drug</label>
-        <select id="wn-addon">
-          <option value="none" selected>None</option>
-          <option value="clonidine">Clonidine</option>
-          <option value="pregabalin">Pregabalin</option>
+        <label for="wn-clon-on">On clonidine?</label>
+        <select id="wn-clon-on">
+          <option value="no" selected>No</option>
+          <option value="yes">Yes</option>
         </select>
       </div>
-      <div class="field" id="wn-addon-mgkg-field">
-        <label for="wn-addon-mgkg">Shelter dose (mg/kg per dose, BID)</label>
-        <input type="number" id="wn-addon-mgkg" min="0.005" max="60" step="0.5" value="0.02">
-        <div class="field-help" id="wn-addon-help"></div>
+      <div class="field" id="wn-clon-mgkg-field">
+        <label for="wn-clon-mgkg">Shelter dose (mg/kg per dose, BID)</label>
+        <input type="number" id="wn-clon-mgkg" min="0.005" max="60" step="0.005" value="0.02">
+        <div class="field-help" id="wn-clon-help"></div>
       </div>
-      <div class="field" id="wn-addon-days-field">
-        <label for="wn-addon-days">Time on add-on</label>
-        <select id="wn-addon-days">
+      <div class="field" id="wn-clon-days-field">
+        <label for="wn-clon-days">Time on clonidine</label>
+        <select id="wn-clon-days">
+          <option value="short">28 days or less</option>
+          <option value="long" selected>More than 28 days</option>
+        </select>
+      </div>
+
+      <div class="form-group-label">Pregabalin</div>
+      <div class="field">
+        <label for="wn-preg-on">On pregabalin?</label>
+        <select id="wn-preg-on">
+          <option value="no" selected>No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+      <div class="field" id="wn-preg-mgkg-field">
+        <label for="wn-preg-mgkg">Shelter dose (mg/kg per dose, BID)</label>
+        <input type="number" id="wn-preg-mgkg" min="0.005" max="60" step="0.5" value="4">
+        <div class="field-help" id="wn-preg-help"></div>
+      </div>
+      <div class="field" id="wn-preg-days-field">
+        <label for="wn-preg-days">Time on pregabalin</label>
+        <select id="wn-preg-days">
           <option value="short">28 days or less</option>
           <option value="long" selected>More than 28 days</option>
         </select>
@@ -2448,25 +2468,27 @@ function recalcWean(rebuild) {
     plans.push({ drugKey: 'trazodone', startOption: tOpt, wean: val('wn-traz-days') === 'long' });
   }
 
-  /* add-on */
-  var addonKey = val('wn-addon');
-  var hasAddon = addonKey !== 'none';
-  ['wn-addon-mgkg-field', 'wn-addon-days-field'].forEach(function (id) {
-    el(id).classList.toggle('dimmed', !hasAddon);
-    var c = el(id).querySelector('input, select');
-    if (c) c.disabled = !hasAddon;
+  /* clonidine and pregabalin - independent of trazodone and each other, so a
+     dog on all three at once can be weaned in one pass */
+  [{ key: 'clonidine', prefix: 'wn-clon' }, { key: 'pregabalin', prefix: 'wn-preg' }].forEach(function (d) {
+    var on = val(d.prefix + '-on') === 'yes';
+    [d.prefix + '-mgkg-field', d.prefix + '-days-field'].forEach(function (id) {
+      el(id).classList.toggle('dimmed', !on);
+      var c = el(id).querySelector('input, select');
+      if (c) c.disabled = !on;
+    });
+    if (on) {
+      var dMgKg = parseFloat(el(d.prefix + '-mgkg').value);
+      if (!isFinite(dMgKg) || dMgKg <= 0) dMgKg = DRUGS[d.key].startMgKg;
+      el(d.prefix + '-help').textContent = 'Target ' + amt(d.key, dMgKg * p.weight) + ' per dose.';
+      var dOpt = pickNearest(d.key, dMgKg * p.weight, { weight: p.weight });
+      plans.push({ drugKey: d.key, startOption: dOpt, wean: val(d.prefix + '-days') === 'long' });
+    }
   });
-  if (hasAddon) {
-    var aMgKg = parseFloat(el('wn-addon-mgkg').value);
-    if (!isFinite(aMgKg) || aMgKg <= 0) aMgKg = DRUGS[addonKey].startMgKg;
-    el('wn-addon-help').textContent = 'Target ' + amt(addonKey, aMgKg * p.weight) + ' per dose.';
-    var aOpt = pickNearest(addonKey, aMgKg * p.weight, { weight: p.weight });
-    plans.push({ drugKey: addonKey, startOption: aOpt, wean: val('wn-addon-days') === 'long' });
-  }
 
   if (!plans.length) {
     el('wean-result').innerHTML = '<div class="banner banner-info"><h4>No medication selected</h4>'
-      + '<p>Select trazodone, an add-on, or both.</p></div>';
+      + '<p>Select trazodone, clonidine, pregabalin, or any combination.</p></div>';
     el('label-result').innerHTML = '';
     el('wean-note').textContent = '';
     return;
@@ -2518,15 +2540,18 @@ function recalcWean(rebuild) {
   });
 
   var weaning = plans.filter(function (x) { return x.wean; });
-  if (weaning.length === 2) {
-    wHtml += '<div class="banner banner-info"><h4>Both drugs weaning</h4>'
-           + '<p>Both drugs have been given for more than 28 days, so they step down in parallel and finish together.</p></div>';
-  } else if (weaning.length === 1 && plans.length === 2) {
-    var stopped = plans.filter(function (x) { return !x.wean; })[0];
-    wHtml += '<div class="banner banner-info"><h4>One drug weaning</h4>'
+  var notWeaning = plans.filter(function (x) { return !x.wean; });
+  var names = function (list) { return list.map(function (x) { return esc(DRUGS[x.drugKey].name); }); };
+  if (weaning.length > 1) {
+    wHtml += '<div class="banner banner-info"><h4>' + weaning.length + ' drugs weaning</h4>'
+           + '<p>' + joinList(names(weaning))
+           + ' have all been given for more than 28 days, so they step down in parallel and finish together.</p></div>';
+  } else if (weaning.length === 1 && notWeaning.length) {
+    wHtml += '<div class="banner banner-info"><h4>' + (notWeaning.length > 1 ? 'Other drugs' : 'One drug') + ' not weaning</h4>'
            + '<p>' + esc(DRUGS[weaning[0].drugKey].name) + ' weans over the schedule above. '
-           + esc(DRUGS[stopped.drugKey].name)
-           + ' was given for 28 days or less, so it stops at exit with no wean.</p></div>';
+           + joinList(names(notWeaning)) + (notWeaning.length > 1 ? ' were' : ' was')
+           + ' given for 28 days or less, so ' + (notWeaning.length > 1 ? 'they stop' : 'it stops')
+           + ' at exit with no wean.</p></div>';
   } else if (!weaning.length) {
     wHtml += '<div class="banner banner-success"><h4>Nothing to wean</h4>'
            + '<p>All medication has been given for 28 days or less. Stop at exit.</p></div>';
@@ -2650,22 +2675,10 @@ el('start-fas').addEventListener('input', function () { recalcStart(false); });
 });
 
 /* wean mode */
-['wn-traz-on', 'wn-traz-days', 'wn-addon', 'wn-addon-days'].forEach(function (id) {
-  el(id).addEventListener('change', function () {
-    if (id === 'wn-addon') {
-      var a = val('wn-addon');
-      if (a !== 'none') {
-        el('wn-addon-mgkg').value = DRUGS[a].startMgKg;
-        tuneMgKgField('wn-addon-mgkg', a);
-      }
-      resetDerived();
-      recalcWean(true);
-      return;
-    }
-    recalcWean(false);
-  });
+['wn-traz-on', 'wn-traz-days', 'wn-clon-on', 'wn-clon-days', 'wn-preg-on', 'wn-preg-days'].forEach(function (id) {
+  el(id).addEventListener('change', function () { recalcWean(false); });
 });
-['wn-traz-mgkg', 'wn-addon-mgkg'].forEach(function (id) {
+['wn-traz-mgkg', 'wn-clon-mgkg', 'wn-preg-mgkg'].forEach(function (id) {
   el(id).addEventListener('input', function () { resetDerived(); recalcWean(true); });
 });
 
