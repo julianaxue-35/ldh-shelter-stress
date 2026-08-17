@@ -50,8 +50,8 @@ arousal branch trials trazodone first, pregabalin if trazodone isn't suitable.
 **At the ceiling**, add the same branch-paired second-line drug (one add-on only), then titrate it
 by 25% each check up to its own ceiling. Above either ceiling, refer to the behaviour department.
 Gabapentin, mirtazapine and Zylkene are not part of this pathway. A dog on trazodone at 4 weeks
-should be considered for long-term behaviour medication — consult Dr Leonie Poulter for case
-management.
+should be considered for long-term behaviour medication — refer to the behaviour department for
+case management.
 
 **Serotonergic combinations.** If the dog is already on another serotonergic medication, the
 trazodone ceiling drops from 10 to **7 mg/kg BID**. A shared yes/no field drives every ceiling

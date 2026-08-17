@@ -609,9 +609,66 @@ details.charts > summary {
   .btn-row, .no-print, .mode-bar { display: none !important; }
   .wean-table select { border: none; background: none; -webkit-appearance: none; appearance: none; }
 }
+
+#ldh-gate {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg-tertiary);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+#ldh-gate.hidden { display: none; }
+.ldh-gate-box {
+  background: var(--bg); border: 0.5px solid var(--border-tertiary);
+  border-radius: var(--radius-lg); padding: 1.5rem; max-width: 320px; width: 100%;
+  text-align: center;
+}
+.ldh-gate-box p { font-size: 14px; color: var(--text-secondary); margin: 0 0 12px; }
+.ldh-gate-box input {
+  width: 100%; padding: 10px; font-size: 16px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-secondary); margin-bottom: 10px; box-sizing: border-box;
+  background: var(--bg); color: var(--text-primary);
+}
+.ldh-gate-box button {
+  width: 100%; padding: 10px; font-size: 14px; font-weight: 500;
+  border-radius: var(--radius-md); border: none; cursor: pointer;
+  background: var(--text-primary); color: var(--bg);
+}
+.ldh-gate-err { color: #A32D2D; font-size: 12px; margin-top: 8px; display: none; }
+body.ldh-locked > .container { display: none; }
 </style>
 </head>
-<body>
+<body class="ldh-locked">
+
+<div id="ldh-gate">
+  <div class="ldh-gate-box">
+    <p><strong>LDH internal tool</strong><br>Enter the access code to continue.</p>
+    <input type="password" id="ldh-gate-input" placeholder="Access code" autocomplete="off">
+    <button id="ldh-gate-btn" type="button">Enter</button>
+    <p class="ldh-gate-err" id="ldh-gate-err">Incorrect code. Try again.</p>
+  </div>
+</div>
+<script>
+(function () {
+  var PASS = 'LDH2026';
+  var body = document.body;
+  var gate = document.getElementById('ldh-gate');
+  function unlock() {
+    body.classList.remove('ldh-locked');
+    gate.classList.add('hidden');
+    sessionStorage.setItem('ldhGateOk', '1');
+  }
+  if (sessionStorage.getItem('ldhGateOk') === '1') { unlock(); return; }
+  var input = document.getElementById('ldh-gate-input');
+  var err = document.getElementById('ldh-gate-err');
+  function check() {
+    if (input.value === PASS) unlock();
+    else { err.style.display = 'block'; input.value = ''; input.focus(); }
+  }
+  document.getElementById('ldh-gate-btn').addEventListener('click', check);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') check(); });
+  input.focus();
+})();
+</script>
 
 <div class="container">
 
@@ -980,7 +1037,7 @@ details.charts > summary {
     <div class="fc-box fc-amber">
       <span class="fc-step-label">Step 6 &middot; At 4 weeks</span>
       <div class="fc-box-title">Consider long-term medication</div>
-      <div class="fc-box-sub">A dog still on trazodone at 4 weeks should be considered for long-term behaviour medication rather than continued short-acting treatment. Consult Dr Leonie Poulter, Behaviour Department Veterinarian, for case management.</div>
+      <div class="fc-box-sub">A dog still on trazodone at 4 weeks should be considered for long-term behaviour medication rather than continued short-acting treatment. Refer to the behaviour department for case management.</div>
     </div>
     <div class="fc-arrow-down"></div>
 
@@ -1228,7 +1285,7 @@ details.charts > summary {
       <tr>
         <td>Long-term medication</td>
         <td>Not specified</td>
-        <td>New trigger: a dog on trazodone at <strong>4 weeks</strong> should be considered for long-term medication &mdash; consult Dr Leonie Poulter for case management</td>
+        <td>New trigger: a dog on trazodone at <strong>4 weeks</strong> should be considered for long-term medication &mdash; refer to the behaviour department for case management</td>
       </tr>
     </tbody>
   </table>
@@ -2240,10 +2297,10 @@ function recalcRecheck() {
     html += '<div class="banner banner-warning"><h4>Four weeks on medication</h4>'
           + '<p>This dog has been on shelter stress medication for 4 weeks or more. Consider starting '
           + 'long-term behaviour medication rather than continuing short-acting treatment.</p>'
-          + '<p><strong>Consult Dr Leonie Poulter, Behaviour Department Veterinarian, for case management.</strong></p></div>';
+          + '<p><strong>Refer to the behaviour department for case management.</strong></p></div>';
     planLines.push('');
     planLines.push('On medication 4 weeks or more - consider long-term behaviour medication.');
-    planLines.push('To consult Dr Leonie Poulter for case management.');
+    planLines.push('Referred to the behaviour department for case management.');
   }
 
   el('rc-result').innerHTML = html;
