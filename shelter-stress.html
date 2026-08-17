@@ -616,7 +616,8 @@ details.charts > summary {
 <div class="container">
 
 <div class="header">
-  <h1>LDH Shelter Stress Protocol</h1>
+  <p style="margin:0 0 8px;"><a href="index.html">&larr; LDH Veterinary Decision Support</a></p>
+  <h1>LDH Shelter Stress Protocol &mdash; Dogs</h1>
   <p>Dosing, recheck and weaning support for LDH North Melbourne and Cranbourne. Implements the SOP <em>Shelter Stress Management &ndash; Dogs</em> v1.2 &mdash; see <a href="#deviations">what changed</a>. For veterinary use only. Tool version 1.2.</p>
 </div>
 
@@ -1765,6 +1766,30 @@ function buildLabels(drugKey, ladder) {
    ================================================================== */
 var mode = 'start';
 var overrides = {};
+var rcChoice = 'A';   /* which lettered option the vet has ticked in recheck mode */
+
+/* Renders a set of mutually exclusive lettered options (radio buttons above
+   their dose cards, shown only when there is more than one) and returns the
+   currently chosen one. rcChoice persists across recalcRecheck() calls so
+   the vet's pick survives a re-render; if it no longer matches an option in
+   this render (drug/response changed), it falls back to the first. */
+function choiceGroup(options) {
+  var letters = options.map(function (o) { return o.letter; });
+  if (letters.indexOf(rcChoice) === -1) rcChoice = letters[0];
+  var html = '';
+  if (options.length > 1) {
+    html += '<div class="choice-group">';
+    options.forEach(function (o) {
+      html += '<label class="choice-radio"><input type="radio" name="rc-choice" value="' + o.letter
+            + '"' + (o.letter === rcChoice ? ' checked' : '') + '> Option ' + o.letter + ' &mdash; '
+            + esc(o.label) + '</label>';
+    });
+    html += '</div>';
+  }
+  options.forEach(function (o) { html += o.render(); });
+  var chosen = options.filter(function (o) { return o.letter === rcChoice; })[0];
+  return { html: html, chosen: chosen };
+}
 
 function el(id) { return document.getElementById(id); }
 function val(id) { return el(id).value.trim(); }

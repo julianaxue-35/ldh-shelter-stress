@@ -6,6 +6,12 @@ A single self-contained HTML tool implementing the LDH SOP *Shelter Stress Manag
 Open `shelter-stress.html` in any browser. No server, no install, nothing external — it can be
 emailed or dropped on a shared drive as-is.
 
+**`index.html`** is the new **LDH Veterinary Decision Support** hub — a landing page with cards
+for each species/protocol tool. It links to `shelter-stress.html` (this repo, dog) and out to the
+cat gabapentin protocol in the separate `sedation-protocol` repo
+(`julianaxue-35.github.io/sedation-protocol/cat_gabapentin_protocol.html`) rather than duplicating
+it here. `shelter-stress.html` links back to the hub via a small `&larr;` line above its title.
+
 **Location:** `Dropbox/work docs/job related info/LDH docs/ldh-shelter-stress-protocol/` — moved
 here from `~/ldh-shelter-stress` on 13 Aug 2026 so it lives alongside the Word SOP. It is still a
 git repo (`.git` moved with it) backed up to a **private** GitHub remote
