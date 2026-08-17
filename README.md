@@ -1,7 +1,7 @@
 # LDH Shelter Stress Protocol
 
 A single self-contained HTML tool implementing the LDH SOP *Shelter Stress Management – Dogs*
-**v1.1** across the North Melbourne and Cranbourne sites.
+**v1.2** across the North Melbourne and Cranbourne sites.
 
 Open `shelter-stress.html` in any browser. No server, no install, nothing external — it can be
 emailed or dropped on a shared drive as-is.
@@ -23,21 +23,29 @@ so it is a **private** GitHub repo with no Pages site and no public URL.
 | Mode | For | Produces |
 |---|---|---|
 | **1. Start medication** | New shelter stress case | Starting dose + tablet breakdown, reassessment prompt, note for Teams/Sheltermate |
-| **2. Recheck** | 48–72 h or weekly review | Maintain / increase 25% / add second drug / refer, with the new dose and pen medication instruction |
+| **2. Recheck** | 48–72 h or weekly review | Maintain / increase 25% / trial the paired second-line drug / add second drug at the ceiling / refer, with the new dose and pen medication instruction |
 | **3. Wean and discharge** | Adoption, foster, rescue | Weaning ladder, dispensing labels with quantities, waiver text for the Sheltermate indemnity |
 
-## Clinical rules (SOP v1.1)
+## Clinical rules (SOP v1.2)
 
-Three medications only. Trazodone 5 mg/kg BID first line for **every** dog regardless of size,
-titrated in 25% increments to a ceiling of 10 mg/kg BID. At the ceiling, add ONE second-line drug
-chosen on the presenting signs:
+Three medications only, branching at first presentation instead of trazodone-for-everyone:
 
-- **Clonidine** 0.02 mg/kg BID — aroused or reactive dogs, ceiling 0.05 mg/kg BID
-- **Pregabalin** 2–10 mg/kg BID — fearful or shut-down dogs, ceiling 10 mg/kg BID
+- **Fearful or shut-down dogs** start **trazodone** 5 mg/kg BID, ceiling 10 mg/kg BID (7 mg/kg BID
+  on another serotonergic medication)
+- **Aroused or reactive dogs** start **clonidine** 0.02 mg/kg BID, ceiling 0.05 mg/kg BID
 
-Above either ceiling, refer to the behaviour department. Gabapentin, mirtazapine and Zylkene are
-not part of this pathway. A dog on trazodone at 4 weeks should be considered for long-term
-behaviour medication — consult Dr Leonie Poulter for case management.
+**Partial response** (either branch): titrate the current drug up 25% each check; pregabalin
+(2–10 mg/kg BID) can also be added as an adjunct.
+
+**Ineffective response** (either branch, below the ceiling): keep titrating by 25%, or trial the
+branch-paired drug immediately instead of waiting for the ceiling — fear branch trials clonidine;
+arousal branch trials trazodone first, pregabalin if trazodone isn't suitable.
+
+**At the ceiling**, add the same branch-paired second-line drug (one add-on only), then titrate it
+by 25% each check up to its own ceiling. Above either ceiling, refer to the behaviour department.
+Gabapentin, mirtazapine and Zylkene are not part of this pathway. A dog on trazodone at 4 weeks
+should be considered for long-term behaviour medication — consult Dr Leonie Poulter for case
+management.
 
 **Serotonergic combinations.** If the dog is already on another serotonergic medication, the
 trazodone ceiling drops from 10 to **7 mg/kg BID**. A shared yes/no field drives every ceiling
@@ -52,11 +60,17 @@ serotonin syndrome list — the tool says so, since the wrong reading leads to a
 | Drug | Strengths | Splitting | Floor |
 |---|---|---|---|
 | Trazodone | 100 mg tablet | ¼, ½, ¾ | 25 mg |
-| Clonidine | 100 mcg, 150 mcg tablets; 1200 mcg compounded | ¼, ½, ¾ | 25 mcg |
+| Clonidine, under 10 kg | 100 mcg, 150 mcg tablets; 1200 mcg compounded | ¼, ½, ¾ | 25 mcg |
+| Clonidine, 10 kg and up | 1200 mcg compounded only | ¼, ½, ¾ | 300 mcg |
 | Pregabalin | 25, 75 mg capsules | none — do not open | 25 mg |
 
+Above 10 kg the tool stops offering the 100/150 mcg tablets — showing small-dog strengths to a
+30 kg dog just causes confusion — but the 1200 mcg tablet quartered (300 mcg) can't reach the
+0.02–0.05 mg/kg therapeutic range under about 10 kg, which is why the small strengths stay
+available there (`DRUGS.clonidine.smallCutoffKg` in the script; see `unitsFor`/`floorFor`).
 Clonidine strengths come from the Veterinary Decision Support sedation protocol
-(`~/sedation-protocol/dog-sedation.html`) and **still need confirming against what LDH stocks**.
+(`~/sedation-protocol/dog-sedation.html`) and **still need confirming against what LDH stocks**,
+including whether 10 kg is the right cutoff.
 
 ### Weaning
 
@@ -81,18 +95,24 @@ Labels, quantities and the waiver text all recalculate.
 ### Sign tick boxes
 
 Ten signs, five arousal and five fear, chosen as the ones a shelter vet most often sees at the pen.
-Arousal signs point to clonidine, fear signs to pregabalin. Juliana's full body-language reference
-charts (15-panel arousal, 17-panel fear, from `~/behaviour-resources/`) appear both under the tick
-boxes and in *Recognising shelter stress*. The base64 is held once in a `CHARTS` object and
-rendered into every `[data-charts]` container, so two placements cost one copy of each image.
+Fear signs point to trazodone first line, arousal signs to clonidine first line. Juliana's full
+body-language reference charts (15-panel arousal, 17-panel fear, from `~/behaviour-resources/`)
+appear both under the tick boxes and in *Recognising shelter stress*. The base64 is held once in a
+`CHARTS` object and rendered into every `[data-charts]` container, so two placements cost one copy
+of each image.
+
+Recheck mode has its own 18-item checklist (`RC_SIGNS`) with three groups — fear, arousal (reused
+from the Start-mode arousal signs) and "improved" — so a recheck can document that the dog is
+settled, not just that it's still stressed. It's documentation only: ticking signs doesn't drive
+the Response dropdown, which stays an explicit clinical call.
 
 ## Worked examples (regression cases)
 
 ```
-Trazodone 150 mg BID (30 kg @ 5)   Clonidine 400 mcg BID (20 kg @ 0.02)
-  Wk1  1   × 100 mg = 100  67%       Wk1  2 × 150 mcg = 300  75%
-  Wk2  ¾   × 100 mg =  75  50%       Wk2  2 × 100 mcg = 200  50%
-  Wk3  ½   × 100 mg =  50  33%       Wk3  1 × 100 mcg = 100  25%
+Trazodone 150 mg BID (30 kg @ 5)   Clonidine 600 mcg BID (20 kg @ 0.03, >=10 kg branch)
+  Wk1  1   × 100 mg = 100  67%       Wk1  ¼ × 1200 mcg = 300 mcg  50%
+  Wk2  ¾   × 100 mg =  75  50%       Wk2  ¼ × 1200 mcg = 300 mcg  50%  (SID)
+  Wk3  ½   × 100 mg =  50  33%       Wk3  ¼ × 1200 mcg = 300 mcg  50%  (SID)
   Wk4  ¼   × 100 mg =  25  17%       then STOP
   then STOP
 
@@ -102,15 +122,21 @@ Pregabalin 150 mg BID (40 kg @ 4)  Pregabalin 25 mg BID (5 kg, at floor)
   Wk3  2 × 25   =  50  33%           then STOP
   Wk4  1 × 25   =  25  17%
   then STOP
+
+Clonidine 160 mcg BID (8 kg @ 0.02, <10 kg branch)
+  Wk1  ¾ × 150 mcg = 110 mcg  69%
+  Wk2  ½ × 150 mcg =  80 mcg  50%
+  Wk3  ¼ × 150 mcg =  40 mcg  25%
+  then STOP
 ```
 
 ## Relationship to the Word SOP
 
-The parent folder (`Dropbox/.../LDH docs/`) holds `Shelter Stress Protocol v1.1.docx`, which
+The parent folder (`Dropbox/.../LDH docs/`) holds `Shelter Stress Protocol v1.2.docx`, which
 carries the same changes, written into the original SOP with its sentence shapes preserved and a
-v1.1 row added to the version-control table. `Shelter Stress Protocol.docx` (v1.0) sits alongside
-it, untouched. The tool's *What changed in SOP v1.1* table lists the differences from v1.0 for
-staff who learned the old protocol.
+v1.2 row added to the version-control table. `Shelter Stress Protocol.docx` (v1.0) sits alongside
+it, untouched. The tool's *What changed* section lists the differences from v1.0 through v1.2 for
+staff who learned an earlier protocol.
 
 The SOP's section 5 link points to this folder's `shelter-stress.html` by local file path — it
 only resolves on this machine. If the SOP is shared more widely, that link and the file both need
